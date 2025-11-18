@@ -73,11 +73,36 @@ OptiScaler Manager/
 - Windows 10 version 1903+ or Windows 11
 - Windows App SDK
 
-### **Quick Start**
+## 🏪 **Distribution Strategy**
+
+**OptiScaler Manager** is designed exclusively for **Microsoft Store** distribution:
+
+- 🎯 **Primary Channel**: Microsoft Store (MSIX)
+- 🔒 **Private Development**: Local development only
+- ✅ **Official Distribution**: No GitHub releases
+- 🛡️ **Secure Installation**: MSIX sandboxing and certificates
+- 🔄 **Auto-Updates**: Through Microsoft Store
+
+### **📋 Relationship with Original**
+
+| 🏷️ **Product** | 🚀 **Distribution** | 🎯 **Purpose** | 👥 **Audience** |
+|----------------|-------------------|---------------|-----------------|
+| **OptiScaler (Python)** | GitHub Releases | Open Source Tool | Power Users |
+| **OptiScaler Manager** | Microsoft Store | Premium App | General Users |
+
+## �️ **Development Setup**
+
+### **Prerequisites**
+- Visual Studio 2022 Community (recommended) or VS Code
+- .NET 8 SDK
+- Windows 10 version 1903+ or Windows 11
+- Windows App SDK
+- Microsoft Store developer account (for publishing)
+
+### **Local Development**
 
 ```bash
-# Clone repository
-git clone https://github.com/Bigflood92/OptiScaler-Manager.git
+# Navigate to project directory
 cd "OptiScaler Manager"
 
 # Restore packages
@@ -90,19 +115,15 @@ dotnet build
 dotnet run --project OptiScaler.UI
 ```
 
-## 📋 **Relationship with Original**
+### **MSIX Packaging for Store**
 
-### **🐍 OptiScaler (Python) - v2.4.x**
-- **Status**: ✅ Stable maintenance
-- **Purpose**: Bug fixes and minor improvements
-- **Distribution**: GitHub Releases (.exe)
-- **Repository**: [OptiScaler-Manager](https://github.com/Bigflood92/OptiScaler-Manager) `main` branch
+```bash
+# Build for store submission
+dotnet publish -c Release -f net8.0-windows10.0.19041.0
 
-### **⚡ OptiScaler Manager (.NET) - v0.0.x**
-- **Status**: 🚧 Active development
-- **Purpose**: Complete modern rewrite
-- **Distribution**: Microsoft Store (MSIX)
-- **Repository**: This repository `main` branch
+# Package with Visual Studio or
+# Use Windows Application Packaging Project
+```
 
 ## 🤝 **Contributing**
 

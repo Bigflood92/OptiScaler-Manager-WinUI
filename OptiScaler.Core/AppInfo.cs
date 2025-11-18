@@ -54,9 +54,15 @@ public static class AppInfo
     public const string ProductId = "OptiScaler.Manager";
     
     /// <summary>
-    /// GitHub repository URL
+    /// Development repository URL - For reference only
+    /// Public distribution via Microsoft Store exclusively
     /// </summary>
-    public const string GitHubUrl = "https://github.com/Bigflood92/OptiScaler-Manager";
+    public const string DevelopmentUrl = "Private development repository";
+    
+    /// <summary>
+    /// Microsoft Store product page (when published)
+    /// </summary>
+    public const string StoreUrl = "ms-windows-store://pdp/?productid=9XXXXXXXXXX"; // Will be updated on store submission
     
     /// <summary>
     /// Release notes for current version
