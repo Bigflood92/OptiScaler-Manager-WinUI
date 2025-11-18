@@ -1,0 +1,136 @@
+<Page
+    x:Class="OptiScaler.UI.Views.ScanPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Background="Transparent">
+
+    <ScrollViewer>
+        <StackPanel Spacing="32">
+            
+            <!-- Hero Header con gradiente -->
+            <Grid MinHeight="180" Padding="40,24">
+                <Grid.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#1A1A1A" Offset="0"/>
+                        <GradientStop Color="#2D5A5A" Offset="0.5"/>
+                        <GradientStop Color="#4A2D5A" Offset="1"/>
+                    </LinearGradientBrush>
+                </Grid.Background>
+                
+                <StackPanel VerticalAlignment="Center" Spacing="12">
+                    <TextBlock 
+                        Text="Scan Games"
+                        FontSize="36"
+                        FontWeight="Bold"
+                        Foreground="White"/>
+                    <TextBlock 
+                        Text="Discover installed games from Steam, Epic Games, Xbox, and more"
+                        FontSize="16"
+                        Foreground="#CCCCCC"/>
+                    
+                    <!-- Action buttons -->
+                    <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,16,0,0">
+                        <Button 
+                            Content="Start full scan"
+                            Style="{StaticResource XboxButtonStyle}"/>
+                        <Button 
+                            Content="Quick scan"
+                            Style="{StaticResource XboxSecondaryButtonStyle}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+
+            <!-- Content Section -->
+            <StackPanel Padding="40,0" Spacing="20">
+                <TextBlock 
+                    Text="Scan Options"
+                    FontSize="24"
+                    FontWeight="SemiBold"
+                    Foreground="White"
+                    Margin="0,0,0,8"/>
+                
+                <!-- Scan options grid -->
+                <Grid RowSpacing="16" ColumnSpacing="16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Steam -->
+                    <Border 
+                        Grid.Row="0" Grid.Column="0"
+                        Background="#1A1A1A"
+                        CornerRadius="8"
+                        Padding="24"
+                        MinHeight="120">
+                        <StackPanel Spacing="8">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <FontIcon Glyph="&#xE8B2;" FontSize="24" Foreground="White"/>
+                                <TextBlock Text="Steam" FontSize="18" FontWeight="SemiBold" Foreground="White"/>
+                            </StackPanel>
+                            <TextBlock Text="Scan Steam library" FontSize="14" Foreground="#999999"/>
+                            <ToggleSwitch IsOn="True" OnContent="Enabled" OffContent="Disabled"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Epic Games -->
+                    <Border 
+                        Grid.Row="0" Grid.Column="1"
+                        Background="#1A1A1A"
+                        CornerRadius="8"
+                        Padding="24"
+                        MinHeight="120">
+                        <StackPanel Spacing="8">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <FontIcon Glyph="&#xE8B2;" FontSize="24" Foreground="White"/>
+                                <TextBlock Text="Epic Games" FontSize="18" FontWeight="SemiBold" Foreground="White"/>
+                            </StackPanel>
+                            <TextBlock Text="Scan Epic Games library" FontSize="14" Foreground="#999999"/>
+                            <ToggleSwitch IsOn="True" OnContent="Enabled" OffContent="Disabled"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Xbox -->
+                    <Border 
+                        Grid.Row="1" Grid.Column="0"
+                        Background="#1A1A1A"
+                        CornerRadius="8"
+                        Padding="24"
+                        MinHeight="120">
+                        <StackPanel Spacing="8">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <FontIcon Glyph="&#xE990;" FontSize="24" Foreground="#107C10"/>
+                                <TextBlock Text="Xbox" FontSize="18" FontWeight="SemiBold" Foreground="White"/>
+                            </StackPanel>
+                            <TextBlock Text="Scan Xbox Game Pass library" FontSize="14" Foreground="#999999"/>
+                            <ToggleSwitch IsOn="True" OnContent="Enabled" OffContent="Disabled"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Custom paths -->
+                    <Border 
+                        Grid.Row="1" Grid.Column="1"
+                        Background="#1A1A1A"
+                        CornerRadius="8"
+                        Padding="24"
+                        MinHeight="120">
+                        <StackPanel Spacing="8">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <FontIcon Glyph="&#xE8DA;" FontSize="24" Foreground="White"/>
+                                <TextBlock Text="Custom Paths" FontSize="18" FontWeight="SemiBold" Foreground="White"/>
+                            </StackPanel>
+                            <TextBlock Text="Add custom game directories" FontSize="14" Foreground="#999999"/>
+                            <Button Content="Add path" Style="{StaticResource XboxSecondaryButtonStyle}" MinHeight="36" MinWidth="100" FontSize="13"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

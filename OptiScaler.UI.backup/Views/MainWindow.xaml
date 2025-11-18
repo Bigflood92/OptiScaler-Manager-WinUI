@@ -1,0 +1,49 @@
+<Window
+    x:Class="OptiScaler.UI.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid Background="Black">
+        <NavigationView
+            x:Name="NavView"
+            IsBackButtonVisible="Collapsed"
+            IsSettingsVisible="True"
+            PaneDisplayMode="LeftCompact"
+            OpenPaneLength="68"
+            CompactPaneLength="68"
+            IsPaneToggleButtonVisible="False"
+            SelectionChanged="NavigationView_SelectionChanged">
+            
+            <NavigationView.MenuItems>
+                <NavigationViewItem Tag="games" Height="68" ToolTipService.ToolTip="Games">
+                    <NavigationViewItem.Icon>
+                        <SymbolIcon Symbol="Home"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItem Tag="mods" Height="68" ToolTipService.ToolTip="Mods">
+                    <NavigationViewItem.Icon>
+                        <SymbolIcon Symbol="Download"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItem Tag="scan" Height="68" ToolTipService.ToolTip="Scan">
+                    <NavigationViewItem.Icon>
+                        <SymbolIcon Symbol="Find"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.MenuItems>
+
+            <Frame 
+                x:Name="ContentFrame"
+                IsNavigationStackEnabled="False"/>
+        </NavigationView>
+
+        <InfoBar
+            x:Name="NotificationBar"
+            VerticalAlignment="Top"
+            Margin="88,20,20,0"
+            IsOpen="False"
+            IsClosable="True"/>
+    </Grid>
+</Window>

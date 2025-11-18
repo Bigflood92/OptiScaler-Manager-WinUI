@@ -1,0 +1,87 @@
+<Page
+    x:Class="OptiScaler.UI.Views.ModsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Background="Transparent">
+
+    <ScrollViewer>
+        <StackPanel Spacing="32">
+            
+            <!-- Hero Header con gradiente -->
+            <Grid MinHeight="180" Padding="40,24">
+                <Grid.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#1A1A1A" Offset="0"/>
+                        <GradientStop Color="#2D5A5A" Offset="0.5"/>
+                        <GradientStop Color="#4A2D5A" Offset="1"/>
+                    </LinearGradientBrush>
+                </Grid.Background>
+                
+                <StackPanel VerticalAlignment="Center" Spacing="12">
+                    <TextBlock 
+                        Text="Mods &amp; OptiScaler"
+                        FontSize="36"
+                        FontWeight="Bold"
+                        Foreground="White"/>
+                    <TextBlock 
+                        Text="Browse and install OptiScaler versions for your games"
+                        FontSize="16"
+                        Foreground="#CCCCCC"/>
+                    
+                    <!-- Action buttons -->
+                    <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,16,0,0">
+                        <Button 
+                            Content="Check for updates"
+                            Style="{StaticResource XboxButtonStyle}"/>
+                        <Button 
+                            Content="Browse versions"
+                            Style="{StaticResource XboxSecondaryButtonStyle}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+
+            <!-- Content Section -->
+            <StackPanel Padding="40,0" Spacing="20">
+                <TextBlock 
+                    Text="Available Versions"
+                    FontSize="24"
+                    FontWeight="SemiBold"
+                    Foreground="White"
+                    Margin="0,0,0,8"/>
+                
+                <!-- Coming soon message -->
+                <Border 
+                    Background="#1A1A1A"
+                    CornerRadius="8"
+                    Padding="40"
+                    MinHeight="200"
+                    HorizontalAlignment="Stretch">
+                    <StackPanel 
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="16">
+                        <FontIcon 
+                            Glyph="&#xE896;" 
+                            FontSize="48"
+                            Foreground="#666666"/>
+                        <TextBlock 
+                            Text="Coming Soon"
+                            FontSize="20"
+                            FontWeight="SemiBold"
+                            Foreground="#CCCCCC"
+                            HorizontalAlignment="Center"/>
+                        <TextBlock 
+                            Text="Mod management features will be available in a future update"
+                            FontSize="14"
+                            Foreground="#999999"
+                            HorizontalAlignment="Center"
+                            TextAlignment="Center"
+                            MaxWidth="400"
+                            TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

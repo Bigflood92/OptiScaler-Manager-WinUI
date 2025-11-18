@@ -1,0 +1,146 @@
+<Page
+    x:Class="OptiScaler.UI.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Background="Transparent">
+
+    <ScrollViewer>
+        <StackPanel Spacing="32">
+            
+            <!-- Hero Header con gradiente -->
+            <Grid MinHeight="180" Padding="40,24">
+                <Grid.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#1A1A1A" Offset="0"/>
+                        <GradientStop Color="#2D5A5A" Offset="0.5"/>
+                        <GradientStop Color="#4A2D5A" Offset="1"/>
+                    </LinearGradientBrush>
+                </Grid.Background>
+                
+                <StackPanel VerticalAlignment="Center" Spacing="12">
+                    <TextBlock 
+                        Text="Settings"
+                        FontSize="36"
+                        FontWeight="Bold"
+                        Foreground="White"/>
+                    <TextBlock 
+                        Text="Configure OptiScaler Manager preferences"
+                        FontSize="16"
+                        Foreground="#CCCCCC"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Content Section -->
+            <StackPanel Padding="40,0" Spacing="32">
+                
+                <!-- General Settings -->
+                <StackPanel Spacing="16">
+                    <TextBlock 
+                        Text="General"
+                        FontSize="24"
+                        FontWeight="SemiBold"
+                        Foreground="White"/>
+                    
+                    <Border 
+                        Background="#1A1A1A"
+                        CornerRadius="8"
+                        Padding="24">
+                        <StackPanel Spacing="20">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Startup behavior" FontSize="16" FontWeight="SemiBold" Foreground="White"/>
+                                <ToggleSwitch Header="Launch at Windows startup" OnContent="Enabled" OffContent="Disabled"/>
+                            </StackPanel>
+                            
+                            <Border Height="1" Background="#333333"/>
+                            
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Updates" FontSize="16" FontWeight="SemiBold" Foreground="White"/>
+                                <ToggleSwitch Header="Auto-check for updates" IsOn="True" OnContent="Enabled" OffContent="Disabled"/>
+                                <ToggleSwitch Header="Auto-update OptiScaler versions" OnContent="Enabled" OffContent="Disabled"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Appearance -->
+                <StackPanel Spacing="16">
+                    <TextBlock 
+                        Text="Appearance"
+                        FontSize="24"
+                        FontWeight="SemiBold"
+                        Foreground="White"/>
+                    
+                    <Border 
+                        Background="#1A1A1A"
+                        CornerRadius="8"
+                        Padding="24">
+                        <StackPanel Spacing="20">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Theme" FontSize="16" FontWeight="SemiBold" Foreground="White"/>
+                                <ComboBox Header="App theme" SelectedIndex="0" MinWidth="200">
+                                    <ComboBoxItem Content="Dark (Xbox style)"/>
+                                    <ComboBoxItem Content="System default"/>
+                                </ComboBox>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Advanced -->
+                <StackPanel Spacing="16">
+                    <TextBlock 
+                        Text="Advanced"
+                        FontSize="24"
+                        FontWeight="SemiBold"
+                        Foreground="White"/>
+                    
+                    <Border 
+                        Background="#1A1A1A"
+                        CornerRadius="8"
+                        Padding="24">
+                        <StackPanel Spacing="20">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Logging" FontSize="16" FontWeight="SemiBold" Foreground="White"/>
+                                <ToggleSwitch Header="Enable detailed logging" OnContent="Enabled" OffContent="Disabled"/>
+                            </StackPanel>
+                            
+                            <Border Height="1" Background="#333333"/>
+                            
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="Data" FontSize="16" FontWeight="SemiBold" Foreground="White"/>
+                                <Button Content="Clear cache" Style="{StaticResource XboxSecondaryButtonStyle}" MinWidth="140"/>
+                                <Button Content="Reset settings" Style="{StaticResource XboxSecondaryButtonStyle}" MinWidth="140"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- About -->
+                <StackPanel Spacing="16">
+                    <TextBlock 
+                        Text="About"
+                        FontSize="24"
+                        FontWeight="SemiBold"
+                        Foreground="White"/>
+                    
+                    <Border 
+                        Background="#1A1A1A"
+                        CornerRadius="8"
+                        Padding="24">
+                        <StackPanel Spacing="12">
+                            <TextBlock Text="OptiScaler Manager" FontSize="18" FontWeight="SemiBold" Foreground="White"/>
+                            <TextBlock Text="Version 0.0.1-dev" FontSize="14" Foreground="#999999"/>
+                            <TextBlock Text="Made for handheld gaming devices" FontSize="14" Foreground="#999999"/>
+                            <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,12,0,0">
+                                <HyperlinkButton Content="GitHub" NavigateUri="https://github.com"/>
+                                <HyperlinkButton Content="Documentation" NavigateUri="https://github.com"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

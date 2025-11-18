@@ -1,0 +1,330 @@
+<Page
+    x:Class="OptiScaler.UI.Views.GamesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:OptiScaler.Core.Models"
+    xmlns:helpers="using:OptiScaler.UI.Helpers"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <!-- Converters -->
+        <helpers:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <helpers:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
+        <helpers:GamePlatformToStringConverter x:Key="GamePlatformToStringConverter"/>
+        <helpers:GamePlatformToIconConverter x:Key="GamePlatformToIconConverter"/>
+        <helpers:ModStatusToTextConverter x:Key="ModStatusToTextConverter"/>
+        <helpers:CountToVisibilityConverter x:Key="CountToVisibilityConverter"/>
+    </Page.Resources>
+
+    <ScrollViewer>
+        <StackPanel Spacing="24" Padding="32">
+            
+            <!-- Hero Header -->
+            <Grid 
+                Height="120" 
+                CornerRadius="12"
+                Background="{StaticResource HeroGradient}">
+                <StackPanel 
+                    VerticalAlignment="Center" 
+                    Padding="32,0"
+                    Spacing="8">
+                    <TextBlock 
+                        Text="Games Library"
+                        FontSize="32"
+                        FontWeight="Bold"
+                        Foreground="White"/>
+                    <TextBlock 
+                        Text="Manage OptiScaler mods for your installed games"
+                        FontSize="16"
+                        Foreground="#CCFFFFFF"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Toolbar -->
+            <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Search Box -->
+                <TextBox 
+                    Grid.Column="0"
+                    PlaceholderText="Search games..."
+                    Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Height="40"
+                    VerticalAlignment="Center"/>
+
+                <!-- Refresh Button -->
+                <Button 
+                    Grid.Column="1"
+                    Content="Refresh"
+                    Style="{StaticResource XboxButtonStyle}"
+                    Click="Refresh_Click"
+                    Height="40"
+                    MinWidth="100">
+                    <Button.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="F5"/>
+                    </Button.KeyboardAccelerators>
+                </Button>
+
+                <!-- Scan Button -->
+                <Button 
+                    Grid.Column="2"
+                    Content="Scan Games"
+                    Style="{StaticResource XboxPrimaryButtonStyle}"
+                    Click="ScanGames_Click"
+                    Height="40"
+                    MinWidth="120"/>
+            </Grid>
+
+            <!-- Installation Progress InfoBar -->
+            <InfoBar
+                IsOpen="{x:Bind ViewModel.IsInstallingMod, Mode=OneWay}"
+                Severity="Informational"
+                Message="{x:Bind ViewModel.StatusMessage, Mode=OneWay}"
+                IsClosable="False">
+                <InfoBar.Content>
+                    <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,8,0,0">
+                        <ProgressRing 
+                            IsActive="{x:Bind ViewModel.IsInstallingMod, Mode=OneWay}"
+                            Width="20"
+                            Height="20"/>
+                        <TextBlock 
+                            Text="Please wait..."
+                            VerticalAlignment="Center"
+                            Foreground="{StaticResource TextGrayBrush}"/>
+                    </StackPanel>
+                </InfoBar.Content>
+            </InfoBar>
+
+            <!-- Status Bar -->
+            <Grid 
+                Background="{StaticResource CardDarkBrush}"
+                CornerRadius="8"
+                Padding="16"
+                Visibility="{x:Bind ViewModel.IsScanning, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <ProgressRing 
+                    Grid.Column="0"
+                    IsActive="{x:Bind ViewModel.IsScanning, Mode=OneWay}"
+                    Width="24"
+                    Height="24"
+                    Margin="0,0,12,0"/>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock 
+                        Text="{x:Bind ViewModel.StatusMessage, Mode=OneWay}"
+                        FontSize="14"
+                        Foreground="White"/>
+                    <ProgressBar 
+                        Value="{x:Bind ViewModel.ScanProgress, Mode=OneWay}"
+                        Maximum="100"
+                        Margin="0,8,0,0"
+                        Height="4"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Games Grid -->
+            <Grid>
+                <!-- ItemsRepeater for Games -->
+                <ScrollViewer 
+                    Visibility="{x:Bind ViewModel.HasNoGames, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                    <ItemsRepeater 
+                        ItemsSource="{x:Bind ViewModel.Games, Mode=OneWay}"
+                        Margin="0,0,0,24">
+                        <ItemsRepeater.Layout>
+                            <UniformGridLayout 
+                                MinItemWidth="280" 
+                                MinItemHeight="360"
+                                ItemsStretch="Fill"
+                                MinColumnSpacing="16"
+                                MinRowSpacing="16"/>
+                        </ItemsRepeater.Layout>
+                        <ItemsRepeater.ItemTemplate>
+                            <DataTemplate x:DataType="models:GameInfo">
+                                <!-- Game Card -->
+                                <Grid 
+                                    Background="{StaticResource XboxCardGradient}"
+                                    CornerRadius="8"
+                                    Padding="16"
+                                    BorderBrush="#33FFFFFF"
+                                    BorderThickness="1">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Game Title -->
+                                    <TextBlock 
+                                        Grid.Row="0"
+                                        Text="{x:Bind Name}"
+                                        FontSize="18"
+                                        FontWeight="Bold"
+                                        Foreground="White"
+                                        TextWrapping="Wrap"
+                                        MaxLines="2"
+                                        TextTrimming="CharacterEllipsis"
+                                        ToolTipService.ToolTip="{x:Bind Name}"/>
+
+                                    <!-- Platform & Status Info -->
+                                    <StackPanel 
+                                        Grid.Row="1" 
+                                        Spacing="12" 
+                                        Margin="0,16,0,16"
+                                        VerticalAlignment="Top">
+                                        
+                                        <!-- Platform Badge -->
+                                        <Border 
+                                            Background="#33FFFFFF"
+                                            CornerRadius="4"
+                                            Padding="10,6"
+                                            HorizontalAlignment="Left">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <FontIcon 
+                                                    Glyph="{x:Bind Platform, Converter={StaticResource GamePlatformToIconConverter}}"
+                                                    FontSize="14"
+                                                    Foreground="White"/>
+                                                <TextBlock 
+                                                    Text="{x:Bind Platform, Converter={StaticResource GamePlatformToStringConverter}}"
+                                                    FontSize="12"
+                                                    Foreground="White"
+                                                    FontWeight="SemiBold"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- OptiScaler Status -->
+                                        <Border 
+                                            Background="{StaticResource XboxGreenBrush}"
+                                            CornerRadius="4"
+                                            Padding="10,6"
+                                            HorizontalAlignment="Left"
+                                            Visibility="{x:Bind HasOptiScaler, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <FontIcon 
+                                                    Glyph="&#xE73E;"
+                                                    FontSize="14"
+                                                    Foreground="White"/>
+                                                <TextBlock 
+                                                    Text="OptiScaler"
+                                                    FontSize="12"
+                                                    Foreground="White"
+                                                    FontWeight="SemiBold"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Game Path -->
+                                        <TextBlock 
+                                            Text="{x:Bind Path}"
+                                            FontSize="11"
+                                            Foreground="#999999"
+                                            TextWrapping="Wrap"
+                                            MaxLines="2"
+                                            TextTrimming="CharacterEllipsis"
+                                            ToolTipService.ToolTip="{x:Bind Path}"/>
+                                    </StackPanel>
+
+                                    <!-- Action Buttons -->
+                                    <StackPanel 
+                                        Grid.Row="2" 
+                                        Spacing="8">
+                                        
+                                        <!-- Launch Button (visible if game has OptiScaler) -->
+                                        <Button 
+                                            Style="{StaticResource XboxGreenButtonStyle}"
+                                            Click="Launch_Click"
+                                            Tag="{x:Bind}"
+                                            HorizontalAlignment="Stretch"
+                                            Visibility="{x:Bind HasOptiScaler, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                                            AutomationProperties.Name="{x:Bind Name, Mode=OneWay}">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <FontIcon Glyph="&#xE768;" FontSize="16"/>
+                                                <TextBlock Text="Launch Game"/>
+                                            </StackPanel>
+                                        </Button>
+
+                                        <!-- Install Mod Button (visible if no OptiScaler) -->
+                                        <Button 
+                                            Style="{StaticResource XboxGreenButtonStyle}"
+                                            Click="InstallMod_Click"
+                                            Tag="{x:Bind}"
+                                            HorizontalAlignment="Stretch"
+                                            Visibility="{x:Bind HasOptiScaler, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}"
+                                            AutomationProperties.Name="{x:Bind Name, Mode=OneWay}">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <FontIcon Glyph="&#xE896;" FontSize="16"/>
+                                                <TextBlock Text="Install Mod"/>
+                                            </StackPanel>
+                                        </Button>
+
+                                        <!-- Secondary Button (Details/Settings) -->
+                                        <Button 
+                                            Style="{StaticResource XboxSecondaryButtonStyle}"
+                                            Tag="{x:Bind}"
+                                            HorizontalAlignment="Stretch"
+                                            AutomationProperties.Name="{x:Bind Name, Mode=OneWay}">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <FontIcon Glyph="&#xE946;" FontSize="16"/>
+                                                <TextBlock Text="Details"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsRepeater.ItemTemplate>
+                    </ItemsRepeater>
+                </ScrollViewer>
+
+                <!-- Empty State -->
+                <Grid 
+                    MinHeight="400"
+                    Visibility="{x:Bind ViewModel.HasNoGames, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <StackPanel 
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="24"
+                        MaxWidth="500">
+                        <FontIcon 
+                            Glyph="&#xE7FC;" 
+                            FontSize="80"
+                            Foreground="#33FFFFFF"/>
+                        <TextBlock 
+                            Text="No games found"
+                            FontSize="28"
+                            FontWeight="SemiBold"
+                            Foreground="White"
+                            HorizontalAlignment="Center"/>
+                        <TextBlock 
+                            Text="Scan your system to detect installed games from Steam, Epic Games, Xbox, EA, Ubisoft, GOG and more"
+                            FontSize="16"
+                            Foreground="#CCCCCC"
+                            TextAlignment="Center"
+                            TextWrapping="Wrap"
+                            MaxWidth="400"/>
+                        <Button 
+                            Style="{StaticResource XboxGreenButtonStyle}"
+                            Click="ScanGames_Click"
+                            Height="52"
+                            MinWidth="180"
+                            FontSize="16"
+                            AutomationProperties.Name="Scan for games">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <FontIcon Glyph="&#xE721;" FontSize="20"/>
+                                <TextBlock Text="Scan Now" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

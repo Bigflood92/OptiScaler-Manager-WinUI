@@ -1,0 +1,109 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Paleta de colores estilo Xbox -->
+    <Color x:Key="XboxGreen">#107C10</Color>
+    <Color x:Key="XboxGreenDark">#0E6A0E</Color>
+    <Color x:Key="XboxGreenLight">#13A313</Color>
+    <Color x:Key="PurpleAccent">#9D4EDD</Color>
+    <Color x:Key="TealAccent">#008B8B</Color>
+    <Color x:Key="BackgroundBlack">#000000</Color>
+    <Color x:Key="SurfaceDark">#151515</Color>
+    <Color x:Key="CardDark">#1E1E1E</Color>
+    <Color x:Key="CardHover">#282828</Color>
+    
+    <!-- Gradientes estilo Xbox -->
+    <LinearGradientBrush x:Key="XboxHeaderGradient" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#1A1A1A" Offset="0"/>
+        <GradientStop Color="#2D5A5A" Offset="0.5"/>
+        <GradientStop Color="#4A2D5A" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <LinearGradientBrush x:Key="XboxBackgroundGradient" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#000000" Offset="0"/>
+        <GradientStop Color="#0A0A0A" Offset="0.3"/>
+        <GradientStop Color="#151515" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <LinearGradientBrush x:Key="XboxCardGradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#1E1E1E" Offset="0"/>
+        <GradientStop Color="#252525" Offset="1"/>
+    </LinearGradientBrush>
+    
+    <!-- SolidColorBrushes -->
+    <SolidColorBrush x:Key="XboxGreenBrush" Color="{StaticResource XboxGreen}"/>
+    <SolidColorBrush x:Key="XboxGreenDarkBrush" Color="{StaticResource XboxGreenDark}"/>
+    <SolidColorBrush x:Key="XboxGreenLightBrush" Color="{StaticResource XboxGreenLight}"/>
+    <SolidColorBrush x:Key="PurpleAccentBrush" Color="{StaticResource PurpleAccent}"/>
+    <SolidColorBrush x:Key="TealAccentBrush" Color="{StaticResource TealAccent}"/>
+    
+    <!-- BotÃƒÂ³n verde (solo para Install/Play - acciones crÃƒÂ­ticas) -->
+    <Style x:Key="XboxGreenButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource XboxGreenBrush}"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="MinHeight" Value="40"/>
+        <Setter Property="MinWidth" Value="120"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Padding" Value="16,10"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+    
+    <!-- BotÃƒÂ³n primario gris oscuro (acciones principales) -->
+    <Style x:Key="XboxPrimaryButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="#2A2A2A"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="MinHeight" Value="48"/>
+        <Setter Property="MinWidth" Value="140"/>
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Padding" Value="20,12"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+    
+    <!-- BotÃƒÂ³n estÃƒÂ¡ndar gris (por defecto para la mayorÃƒÂ­a de acciones) -->
+    <Style x:Key="XboxButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="#2A2A2A"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="MinHeight" Value="48"/>
+        <Setter Property="MinWidth" Value="140"/>
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Padding" Value="20,12"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+    
+    <!-- BotÃƒÂ³n secundario transparente/gris claro -->
+    <Style x:Key="XboxSecondaryButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="#1A1A1A"/>
+        <Setter Property="Foreground" Value="#CCCCCC"/>
+        <Setter Property="MinHeight" Value="48"/>
+        <Setter Property="MinWidth" Value="140"/>
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="FontWeight" Value="Normal"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Padding" Value="20,12"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderBrush" Value="#333333"/>
+    </Style>
+    
+    <!-- TÃƒÂ­tulo grande estilo Xbox -->
+    <Style x:Key="XboxTitleStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="36"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="White"/>
+    </Style>
+    
+    <!-- SubtÃƒÂ­tulo -->
+    <Style x:Key="XboxSubtitleStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="FontWeight" Value="Normal"/>
+        <Setter Property="Foreground" Value="#CCCCCC"/>
+        <Setter Property="Opacity" Value="0.9"/>
+    </Style>
+    
+</ResourceDictionary>

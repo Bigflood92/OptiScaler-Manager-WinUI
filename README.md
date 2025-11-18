@@ -58,9 +58,9 @@ OptiScaler Manager/
 
 | 🏁 **Version** | 🎯 **Milestone** | 📅 **Target** | ✅ **Status** |
 |---------------|-----------------|---------------|--------------|
-| **v0.0.1** | Project setup + Basic UI | Week 1 | 🚧 In Progress |
-| **v0.1.0** | Core services migration | Week 2 | ⏳ Planned |
-| **v0.2.0** | Game scanning & mod install | Week 3 | ⏳ Planned |
+| **v0.0.1** | Project setup + Core Services | Week 1 | ✅ **Complete** |
+| **v0.1.0** | WinUI 3 interface design | Week 2 | ⏳ Planned |
+| **v0.2.0** | Testing & refinement | Week 3 | ⏳ Planned |
 | **v0.3.0** | Xbox Game Bar integration | Week 4 | ⏳ Planned |
 | **v0.4.0** | MSIX packaging | Week 5 | ⏳ Planned |
 | **v1.0.0** | Microsoft Store release | Week 6 | ⏳ Planned |
