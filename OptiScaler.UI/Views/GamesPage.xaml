@@ -17,6 +17,7 @@
         <helpers:GamePlatformToStringConverter x:Key="GamePlatformToStringConverter"/>
         <helpers:GamePlatformToIconConverter x:Key="GamePlatformToIconConverter"/>
         <helpers:PlatformIconConverter x:Key="PlatformIconConverter"/>
+        <helpers:PlatformIconVisibilityConverter x:Key="PlatformIconVisibilityConverter"/>
         <helpers:ModStatusToTextConverter x:Key="ModStatusToTextConverter"/>
         <helpers:CountToVisibilityConverter x:Key="CountToVisibilityConverter"/>
         <converters:BoolToBackgroundConverter x:Key="BoolToBackgroundConverter"/>
@@ -241,7 +242,8 @@
                                                     Source="{x:Bind Platform, Converter={StaticResource PlatformIconConverter}}"
                                                     Width="20"
                                                     Height="20"
-                                                    Stretch="Uniform"/>
+                                                    Stretch="Uniform"
+                                                    Visibility="{x:Bind Platform, Converter={StaticResource PlatformIconVisibilityConverter}}"/>
                                                 <TextBlock 
                                                     Text="{x:Bind Platform, Converter={StaticResource GamePlatformToStringConverter}}"
                                                     FontSize="12"

@@ -224,10 +224,16 @@ public class ModStatusToTextConverter : IValueConverter
 /// </summary>
 public class PlatformIconConverter : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, string language)
+    public object? Convert(object value, Type targetType, object parameter, string language)
     {
         if (value is GamePlatform platform)
         {
+            // For Manual/Custom games, return null (no icon)
+            if (platform == GamePlatform.Manual)
+            {
+                return null;
+            }
+
             var iconName = platform switch
             {
                 GamePlatform.Steam => "steam.png",
@@ -236,17 +242,41 @@ public class PlatformIconConverter : IValueConverter
                 GamePlatform.GOG => "gog.png",
                 GamePlatform.EA => "ea.png",
                 GamePlatform.Ubisoft => "ubisoft.png",
-                GamePlatform.Manual => "manual.png",
-                _ => "manual.png"
+                _ => null
             };
+
+            if (iconName == null)
+            {
+                return null;
+            }
 
             var uri = new Uri($"ms-appx:///Assets/PlatformIcons/{iconName}");
             return new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(uri);
         }
 
-        // Fallback icon
-        return new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(
-            new Uri("ms-appx:///Assets/PlatformIcons/manual.png"));
+        return null;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+/// <summary>
+/// Converts GamePlatform enum to platform icon image source
+/// </summary>
+public class PlatformIconVisibilityConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        if (value is GamePlatform platform)
+        {
+            return platform == GamePlatform.Manual 
+                ? Visibility.Collapsed 
+                : Visibility.Visible;
+        }
+        return Visibility.Collapsed;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, string language)
