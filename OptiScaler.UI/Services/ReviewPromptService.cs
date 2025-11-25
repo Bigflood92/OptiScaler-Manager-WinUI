@@ -17,11 +17,31 @@ public class ReviewPromptService
     private const int LaunchesBeforePrompt = 5;
     private const int DaysBetweenPrompts = 30;
 
-    private readonly Windows.Storage.ApplicationDataContainer _localSettings;
+    private Windows.Storage.ApplicationDataContainer? _localSettings;
+
+    private Windows.Storage.ApplicationDataContainer LocalSettings
+    {
+        get
+        {
+            if (_localSettings == null)
+            {
+                try
+                {
+                    _localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+                }
+                catch
+                {
+                    // Fallback if ApplicationData.Current is not available (e.g., during debugging)
+                    return null!;
+                }
+            }
+            return _localSettings;
+        }
+    }
 
     public ReviewPromptService()
     {
-        _localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+        // Lazy initialization - don't access LocalSettings in constructor
     }
 
     /// <summary>
@@ -29,8 +49,17 @@ public class ReviewPromptService
     /// </summary>
     public void RecordAppLaunch()
     {
-        var currentCount = GetLaunchCount();
-        _localSettings.Values[LaunchCountKey] = currentCount + 1;
+        if (LocalSettings == null) return;
+
+        try
+        {
+            var currentCount = GetLaunchCount();
+            LocalSettings.Values[LaunchCountKey] = currentCount + 1;
+        }
+        catch
+        {
+            // Silently fail if settings are not accessible
+        }
     }
 
     /// <summary>
@@ -38,33 +67,42 @@ public class ReviewPromptService
     /// </summary>
     public bool ShouldShowReviewPrompt()
     {
-        // Don't prompt if user explicitly declined
-        if (_localSettings.Values.ContainsKey(UserDeclinedReviewKey) &&
-            (bool)_localSettings.Values[UserDeclinedReviewKey])
-        {
-            return false;
-        }
+        if (LocalSettings == null) return false;
 
-        // Check launch count
-        var launchCount = GetLaunchCount();
-        if (launchCount < LaunchesBeforePrompt)
+        try
         {
-            return false;
-        }
-
-        // Check time since last prompt
-        if (_localSettings.Values.ContainsKey(LastReviewPromptKey))
-        {
-            var lastPrompt = DateTime.FromBinary((long)_localSettings.Values[LastReviewPromptKey]);
-            var daysSince = (DateTime.Now - lastPrompt).TotalDays;
-            
-            if (daysSince < DaysBetweenPrompts)
+            // Don't prompt if user explicitly declined
+            if (LocalSettings.Values.ContainsKey(UserDeclinedReviewKey) &&
+                (bool)LocalSettings.Values[UserDeclinedReviewKey])
             {
                 return false;
             }
-        }
 
-        return true;
+            // Check launch count
+            var launchCount = GetLaunchCount();
+            if (launchCount < LaunchesBeforePrompt)
+            {
+                return false;
+            }
+
+            // Check time since last prompt
+            if (LocalSettings.Values.ContainsKey(LastReviewPromptKey))
+            {
+                var lastPrompt = DateTime.FromBinary((long)LocalSettings.Values[LastReviewPromptKey]);
+                var daysSince = (DateTime.Now - lastPrompt).TotalDays;
+                
+                if (daysSince < DaysBetweenPrompts)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     /// <summary>
@@ -72,54 +110,63 @@ public class ReviewPromptService
     /// </summary>
     public async Task<bool> ShowReviewPromptAsync(Microsoft.UI.Xaml.XamlRoot xamlRoot)
     {
-        var dialog = new ContentDialog
+        if (LocalSettings == null) return false;
+
+        try
         {
-            Title = "Enjoying OptiScaler Manager?",
-            Content = new StackPanel
+            var dialog = new ContentDialog
             {
-                Spacing = 12,
-                Children =
+                Title = "Enjoying OptiScaler Manager?",
+                Content = new StackPanel
                 {
-                    new TextBlock
+                    Spacing = 12,
+                    Children =
                     {
-                        Text = "We'd love to hear your feedback!",
-                        TextWrapping = Microsoft.UI.Xaml.TextWrapping.Wrap
-                    },
-                    new TextBlock
-                    {
-                        Text = "Your review helps us improve and helps other gamers discover OptiScaler Manager.",
-                        TextWrapping = Microsoft.UI.Xaml.TextWrapping.Wrap,
-                        Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(
-                            Windows.UI.Color.FromArgb(255, 204, 204, 204)),
-                        FontSize = 12,
-                        Margin = new Microsoft.UI.Xaml.Thickness(0, 8, 0, 0)
+                        new TextBlock
+                        {
+                            Text = "We'd love to hear your feedback!",
+                            TextWrapping = Microsoft.UI.Xaml.TextWrapping.Wrap
+                        },
+                        new TextBlock
+                        {
+                            Text = "Your review helps us improve and helps other gamers discover OptiScaler Manager.",
+                            TextWrapping = Microsoft.UI.Xaml.TextWrapping.Wrap,
+                            Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(
+                                Windows.UI.Color.FromArgb(255, 204, 204, 204)),
+                            FontSize = 12,
+                            Margin = new Microsoft.UI.Xaml.Thickness(0, 8, 0, 0)
+                        }
                     }
-                }
-            },
-            PrimaryButtonText = "Rate & Review",
-            SecondaryButtonText = "Maybe Later",
-            CloseButtonText = "Don't Ask Again",
-            DefaultButton = ContentDialogButton.Primary,
-            XamlRoot = xamlRoot
-        };
+                },
+                PrimaryButtonText = "Rate & Review",
+                SecondaryButtonText = "Maybe Later",
+                CloseButtonText = "Don't Ask Again",
+                DefaultButton = ContentDialogButton.Primary,
+                XamlRoot = xamlRoot
+            };
 
-        var result = await dialog.ShowAsync();
+            var result = await dialog.ShowAsync();
 
-        // Update last prompt time
-        _localSettings.Values[LastReviewPromptKey] = DateTime.Now.ToBinary();
+            // Update last prompt time
+            LocalSettings.Values[LastReviewPromptKey] = DateTime.Now.ToBinary();
 
-        switch (result)
+            switch (result)
+            {
+                case ContentDialogResult.Primary:
+                    await LaunchStoreReviewAsync();
+                    return true;
+
+                case ContentDialogResult.None: // "Don't Ask Again"
+                    LocalSettings.Values[UserDeclinedReviewKey] = true;
+                    return false;
+
+                default: // "Maybe Later"
+                    return false;
+            }
+        }
+        catch
         {
-            case ContentDialogResult.Primary:
-                await LaunchStoreReviewAsync();
-                return true;
-
-            case ContentDialogResult.None: // "Don't Ask Again"
-                _localSettings.Values[UserDeclinedReviewKey] = true;
-                return false;
-
-            default: // "Maybe Later"
-                return false;
+            return false;
         }
     }
 
@@ -153,10 +200,20 @@ public class ReviewPromptService
 
     private int GetLaunchCount()
     {
-        if (_localSettings.Values.ContainsKey(LaunchCountKey))
+        if (LocalSettings == null) return 0;
+
+        try
         {
-            return (int)_localSettings.Values[LaunchCountKey];
+            if (LocalSettings.Values.ContainsKey(LaunchCountKey))
+            {
+                return (int)LocalSettings.Values[LaunchCountKey];
+            }
         }
+        catch
+        {
+            // Return 0 if settings are corrupted or inaccessible
+        }
+        
         return 0;
     }
 
@@ -165,8 +222,17 @@ public class ReviewPromptService
     /// </summary>
     public void ResetReviewPromptTracking()
     {
-        _localSettings.Values.Remove(LaunchCountKey);
-        _localSettings.Values.Remove(LastReviewPromptKey);
-        _localSettings.Values.Remove(UserDeclinedReviewKey);
+        if (LocalSettings == null) return;
+
+        try
+        {
+            LocalSettings.Values.Remove(LaunchCountKey);
+            LocalSettings.Values.Remove(LastReviewPromptKey);
+            LocalSettings.Values.Remove(UserDeclinedReviewKey);
+        }
+        catch
+        {
+            // Silently fail if settings are not accessible
+        }
     }
 }
