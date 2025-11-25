@@ -5,131 +5,112 @@
     Background="Transparent">
 
     <ScrollViewer>
-        <StackPanel Spacing="32">
+        <StackPanel Spacing="24" Padding="32">
             
-            <!-- Hero Header con gradiente -->
-            <Grid MinHeight="180" Padding="40,24">
-                <Grid.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                        <GradientStop Color="#1A1A1A" Offset="0"/>
-                        <GradientStop Color="#2D5A5A" Offset="0.5"/>
-                        <GradientStop Color="#4A2D5A" Offset="1"/>
-                    </LinearGradientBrush>
-                </Grid.Background>
-                
-                <StackPanel VerticalAlignment="Center" Spacing="12">
+            <!-- Hero Header -->
+            <Grid 
+                Height="120" 
+                CornerRadius="12"
+                Background="{StaticResource HeroGradient}">
+                <StackPanel 
+                    VerticalAlignment="Center" 
+                    Padding="32,0"
+                    Spacing="8">
                     <TextBlock 
-                        Text="Scan Games"
-                        FontSize="36"
+                        Text="Scan Settings"
+                        FontSize="32"
                         FontWeight="Bold"
                         Foreground="White"/>
                     <TextBlock 
-                        Text="Discover installed games from Steam, Epic Games, Xbox, and more"
+                        Text="Configure game detection and scanning preferences"
                         FontSize="16"
-                        Foreground="#CCCCCC"/>
-                    
-                    <!-- Action buttons -->
-                    <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,16,0,0">
-                        <Button 
-                            Content="Start full scan"
-                            Style="{StaticResource XboxButtonStyle}"/>
-                        <Button 
-                            Content="Quick scan"
-                            Style="{StaticResource XboxSecondaryButtonStyle}"/>
-                    </StackPanel>
+                        Foreground="#CCFFFFFF"/>
                 </StackPanel>
             </Grid>
 
-            <!-- Content Section -->
-            <StackPanel Padding="40,0" Spacing="20">
+            <!-- Quick Actions -->
+            <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
                 <TextBlock 
-                    Text="Scan Options"
-                    FontSize="24"
-                    FontWeight="SemiBold"
-                    Foreground="White"
-                    Margin="0,0,0,8"/>
-                
-                <!-- Scan options grid -->
-                <Grid RowSpacing="16" ColumnSpacing="16">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="1*"/>
-                    </Grid.ColumnDefinitions>
+                    Grid.Column="0"
+                    Text="Manage which platforms and folders to scan for games"
+                    FontSize="14"
+                    Foreground="{StaticResource TextGrayBrush}"
+                    VerticalAlignment="Center"/>
+
+                <Button 
+                    Grid.Column="1"
+                    Style="{StaticResource XboxGreenButtonStyle}"
+                    Height="48"
+                    MinWidth="140">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE721;" FontSize="16"/>
+                        <TextBlock Text="Scan Now"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
+
+            <!-- Coming Soon Content -->
+            <Border 
+                Background="{StaticResource CardDarkBrush}"
+                CornerRadius="12"
+                Padding="48"
+                MinHeight="400"
+                BorderBrush="#33FFFFFF"
+                BorderThickness="1">
+                <StackPanel 
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Spacing="24"
+                    MaxWidth="500">
+                    <FontIcon 
+                        Glyph="&#xE721;" 
+                        FontSize="80"
+                        Foreground="#33FFFFFF"/>
+                    <TextBlock 
+                        Text="Advanced Scan Settings Coming Soon"
+                        FontSize="28"
+                        FontWeight="SemiBold"
+                        Foreground="White"
+                        HorizontalAlignment="Center"
+                        TextAlignment="Center"
+                        TextWrapping="Wrap"/>
+                    <TextBlock 
+                        Text="Customize which gaming platforms and directories OptiScaler Manager scans to detect your games."
+                        FontSize="16"
+                        Foreground="#CCCCCC"
+                        TextAlignment="Center"
+                        TextWrapping="Wrap"/>
                     
-                    <!-- Steam -->
-                    <Border 
-                        Grid.Row="0" Grid.Column="0"
-                        Background="#1A1A1A"
-                        CornerRadius="8"
-                        Padding="24"
-                        MinHeight="120">
-                        <StackPanel Spacing="8">
-                            <StackPanel Orientation="Horizontal" Spacing="12">
-                                <FontIcon Glyph="&#xE8B2;" FontSize="24" Foreground="White"/>
-                                <TextBlock Text="Steam" FontSize="18" FontWeight="SemiBold" Foreground="White"/>
-                            </StackPanel>
-                            <TextBlock Text="Scan Steam library" FontSize="14" Foreground="#999999"/>
-                            <ToggleSwitch IsOn="True" OnContent="Enabled" OffContent="Disabled"/>
+                    <!-- Feature List -->
+                    <StackPanel Spacing="12" Margin="0,16,0,0">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <FontIcon Glyph="&#xE73E;" FontSize="16" Foreground="{StaticResource XboxGreenBrush}"/>
+                            <TextBlock Text="Enable/disable specific platforms" Foreground="#CCCCCC"/>
                         </StackPanel>
-                    </Border>
-                    
-                    <!-- Epic Games -->
-                    <Border 
-                        Grid.Row="0" Grid.Column="1"
-                        Background="#1A1A1A"
-                        CornerRadius="8"
-                        Padding="24"
-                        MinHeight="120">
-                        <StackPanel Spacing="8">
-                            <StackPanel Orientation="Horizontal" Spacing="12">
-                                <FontIcon Glyph="&#xE8B2;" FontSize="24" Foreground="White"/>
-                                <TextBlock Text="Epic Games" FontSize="18" FontWeight="SemiBold" Foreground="White"/>
-                            </StackPanel>
-                            <TextBlock Text="Scan Epic Games library" FontSize="14" Foreground="#999999"/>
-                            <ToggleSwitch IsOn="True" OnContent="Enabled" OffContent="Disabled"/>
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <FontIcon Glyph="&#xE73E;" FontSize="16" Foreground="{StaticResource XboxGreenBrush}"/>
+                            <TextBlock Text="Add custom game directories" Foreground="#CCCCCC"/>
                         </StackPanel>
-                    </Border>
-                    
-                    <!-- Xbox -->
-                    <Border 
-                        Grid.Row="1" Grid.Column="0"
-                        Background="#1A1A1A"
-                        CornerRadius="8"
-                        Padding="24"
-                        MinHeight="120">
-                        <StackPanel Spacing="8">
-                            <StackPanel Orientation="Horizontal" Spacing="12">
-                                <FontIcon Glyph="&#xE990;" FontSize="24" Foreground="#107C10"/>
-                                <TextBlock Text="Xbox" FontSize="18" FontWeight="SemiBold" Foreground="White"/>
-                            </StackPanel>
-                            <TextBlock Text="Scan Xbox Game Pass library" FontSize="14" Foreground="#999999"/>
-                            <ToggleSwitch IsOn="True" OnContent="Enabled" OffContent="Disabled"/>
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <FontIcon Glyph="&#xE73E;" FontSize="16" Foreground="{StaticResource XboxGreenBrush}"/>
+                            <TextBlock Text="Exclude specific folders from scanning" Foreground="#CCCCCC"/>
                         </StackPanel>
-                    </Border>
-                    
-                    <!-- Custom paths -->
-                    <Border 
-                        Grid.Row="1" Grid.Column="1"
-                        Background="#1A1A1A"
-                        CornerRadius="8"
-                        Padding="24"
-                        MinHeight="120">
-                        <StackPanel Spacing="8">
-                            <StackPanel Orientation="Horizontal" Spacing="12">
-                                <FontIcon Glyph="&#xE8DA;" FontSize="24" Foreground="White"/>
-                                <TextBlock Text="Custom Paths" FontSize="18" FontWeight="SemiBold" Foreground="White"/>
-                            </StackPanel>
-                            <TextBlock Text="Add custom game directories" FontSize="14" Foreground="#999999"/>
-                            <Button Content="Add path" Style="{StaticResource XboxSecondaryButtonStyle}" MinHeight="36" MinWidth="100" FontSize="13"/>
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <FontIcon Glyph="&#xE73E;" FontSize="16" Foreground="{StaticResource XboxGreenBrush}"/>
+                            <TextBlock Text="Auto-scan on application startup" Foreground="#CCCCCC"/>
                         </StackPanel>
-                    </Border>
-                </Grid>
-            </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <FontIcon Glyph="&#xE73E;" FontSize="16" Foreground="{StaticResource XboxGreenBrush}"/>
+                            <TextBlock Text="Scheduled background scans" Foreground="#CCCCCC"/>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
 
         </StackPanel>
     </ScrollViewer>

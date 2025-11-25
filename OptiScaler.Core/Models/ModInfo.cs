@@ -72,14 +72,14 @@ public class ModInfo
 public enum ModType
 {
     /// <summary>
-    /// OptiScaler - Universal upscaling mod
+    /// OptiScaler - Universal upscaling mod (cdozdil/OptiScaler)
     /// </summary>
     OptiScaler,
 
     /// <summary>
-    /// DLSS3 to FSR3 Frame Generation
+    /// OptiPatcher - ASI plugin for OptiScaler (cdozdil/OptiPatcher)
     /// </summary>
-    DlssgToFsr3,
+    OptiPatcher,
 
     /// <summary>
     /// Custom or unknown mod type

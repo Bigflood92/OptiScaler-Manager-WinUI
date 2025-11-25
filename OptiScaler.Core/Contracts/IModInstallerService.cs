@@ -18,9 +18,10 @@ public interface IModInstallerService
     /// <param name="game">Game to install mod to</param>
     /// <param name="modType">Type of mod to install</param>
     /// <param name="archivePath">Path to mod archive file</param>
+    /// <param name="targetDllName">Optional: Target DLL name for renaming (OptiScaler only)</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Result of installation operation</returns>
-    Task<ModOperationResult> InstallModAsync(GameInfo game, ModType modType, string archivePath, CancellationToken cancellationToken = default);
+    Task<ModOperationResult> InstallModAsync(GameInfo game, ModType modType, string archivePath, string? targetDllName = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Uninstall a mod from a game

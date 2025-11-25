@@ -24,17 +24,54 @@ public class GameScannerService : IGameScannerService
     public async Task<IEnumerable<GameInfo>> ScanAllPlatformsAsync(CancellationToken cancellationToken = default)
     {
         var allGames = new List<GameInfo>();
-        var platforms = Enum.GetValues<GamePlatform>().Where(p => p != GamePlatform.Unknown && p != GamePlatform.Manual).ToArray();
+        
+        // Load settings to check which platforms are enabled
+        var globalSettings = await new GlobalSettingsService().LoadSettingsAsync();
+        
+        // Build list of enabled platforms
+        var enabledPlatforms = new List<GamePlatform>();
+        
+        if (globalSettings.ScanSteam) enabledPlatforms.Add(GamePlatform.Steam);
+        if (globalSettings.ScanEpic) enabledPlatforms.Add(GamePlatform.Epic);
+        if (globalSettings.ScanXbox) enabledPlatforms.Add(GamePlatform.Xbox);
+        if (globalSettings.ScanGOG) enabledPlatforms.Add(GamePlatform.GOG);
+        if (globalSettings.ScanEA) enabledPlatforms.Add(GamePlatform.EA);
+        if (globalSettings.ScanUbisoft) enabledPlatforms.Add(GamePlatform.Ubisoft);
+        
+        // Add custom game paths as Manual platform
+        if (globalSettings.CustomGamePaths.Any())
+        {
+            foreach (var customPath in globalSettings.CustomGamePaths)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    break;
+                    
+                var game = await VerifyGamePathAsync(customPath);
+                if (game != null)
+                {
+                    allGames.Add(game);
+                    GameDiscovered?.Invoke(this, game);
+                }
+            }
+        }
+        
+        if (!enabledPlatforms.Any())
+        {
+            ReportProgress(0, 0, "No platforms enabled for scanning", 0);
+            return allGames;
+        }
+        
         int completed = 0;
+        int total = enabledPlatforms.Count;
 
-        ReportProgress(platforms.Length, completed, "Starting scan...", 0);
+        ReportProgress(total, completed, "Starting scan...", 0);
 
-        foreach (var platform in platforms)
+        foreach (var platform in enabledPlatforms)
         {
             if (cancellationToken.IsCancellationRequested)
                 break;
 
-            ReportProgress(platforms.Length, completed, $"Scanning {platform}...", allGames.Count);
+            ReportProgress(total, completed, $"Scanning {platform}...", allGames.Count);
 
             try
             {
@@ -48,10 +85,10 @@ public class GameScannerService : IGameScannerService
             }
 
             completed++;
-            ReportProgress(platforms.Length, completed, $"Completed {platform}", allGames.Count);
+            ReportProgress(total, completed, $"Completed {platform}", allGames.Count);
         }
 
-        ReportProgress(platforms.Length, completed, $"Scan complete - {allGames.Count} games found", allGames.Count);
+        ReportProgress(total, completed, $"Scan complete - {allGames.Count} games found", allGames.Count);
         return allGames;
     }
 
@@ -90,6 +127,7 @@ public class GameScannerService : IGameScannerService
             Name = Path.GetFileNameWithoutExtension(executablePath),
             Path = gamePath,
             Executable = executablePath,
+            InstallDirectory = Path.GetDirectoryName(executablePath) ?? gamePath,
             Platform = GamePlatform.Manual
         };
 
@@ -104,11 +142,25 @@ public class GameScannerService : IGameScannerService
     {
         await Task.Run(() =>
         {
-            // Check for OptiScaler DLL files
-            game.HasOptiScaler = CheckForOptiScalerMod(game.Path);
+            // Check for OptiScaler DLL files in the install directory (where the .exe is located)
+            var installDir = !string.IsNullOrEmpty(game.InstallDirectory) ? game.InstallDirectory : game.Path;
+            game.HasOptiScaler = CheckForOptiScalerMod(installDir);
             
-            // Check for DLSSG-to-FSR3 mod files
-            game.HasDlssgToFsr3 = CheckForDlssgToFsr3Mod(game.Path);
+            // Check for OptiPatcher mod files
+            game.HasOptiPatcher = CheckForOptiPatcherMod(installDir);
+            
+            // If OptiScaler is installed, try to read configuration
+            if (game.HasOptiScaler)
+            {
+                ReadOptiScalerConfiguration(game, installDir);
+            }
+            else
+            {
+                // Clear configuration if OptiScaler is not installed
+                game.UpscalingMethod = null;
+                game.QualityPreset = null;
+                game.HasFrameGeneration = false;
+            }
             
             game.LastScanned = DateTime.Now;
         });
@@ -159,6 +211,7 @@ public class GameScannerService : IGameScannerService
                                 Name = Path.GetFileName(gameFolder),
                                 Path = gameFolder,
                                 Executable = executablePath,
+                                InstallDirectory = Path.GetDirectoryName(executablePath) ?? gameFolder,
                                 Platform = GamePlatform.Steam
                             };
 
@@ -204,6 +257,8 @@ public class GameScannerService : IGameScannerService
                         var game = ParseEpicManifest(manifestFile);
                         if (game != null && Directory.Exists(game.Path))
                         {
+                            game.InstallDirectory = Path.GetDirectoryName(game.Executable) ?? game.Path;
+                            
                             RefreshModStatusAsync(game).Wait();
                             games.Add(game);
                             GameDiscovered?.Invoke(this, game);
@@ -230,38 +285,42 @@ public class GameScannerService : IGameScannerService
 
         try
         {
-            // Xbox Game Pass / Microsoft Store apps location
-            var windowsAppsPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
-                "WindowsApps");
+            // Xbox Game Pass games location - C:\XboxGames
+            var xboxGamesPath = @"C:\XboxGames";
 
-            if (!Directory.Exists(windowsAppsPath))
-                return games;
-
-            // Note: WindowsApps requires special permissions
-            // May need to implement alternative detection method via package manager
-            await Task.Run(() =>
+            if (Directory.Exists(xboxGamesPath))
             {
-                try
+                await Task.Run(() =>
                 {
-                    foreach (var gameFolder in Directory.GetDirectories(windowsAppsPath))
+                    foreach (var gameFolder in Directory.GetDirectories(xboxGamesPath))
                     {
                         if (cancellationToken.IsCancellationRequested)
                             break;
 
-                        // Skip system apps
+                        // Skip non-game folders
                         var folderName = Path.GetFileName(gameFolder);
-                        if (folderName.StartsWith("Microsoft.") || folderName.StartsWith("Windows."))
+                        if (folderName.Equals("GameSave", StringComparison.OrdinalIgnoreCase))
                             continue;
 
-                        var executablePath = FindGameExecutableInPath(gameFolder);
+                        // Xbox games typically have a Content subfolder
+                        var contentFolder = Path.Combine(gameFolder, "Content");
+                        var searchPath = Directory.Exists(contentFolder) ? contentFolder : gameFolder;
+
+                        var executablePath = FindXboxGameExecutable(searchPath);
                         if (!string.IsNullOrEmpty(executablePath))
                         {
+                            var exeDir = Path.GetDirectoryName(executablePath) ?? gameFolder;
+                            
+                            Debug.WriteLine($"[GameScanner] Found Xbox game: {folderName}");
+                            Debug.WriteLine($"[GameScanner] Executable: {executablePath}");
+                            Debug.WriteLine($"[GameScanner] InstallDirectory: {exeDir}");
+                            
                             var game = new GameInfo
                             {
-                                Name = folderName.Split('_')[0],
+                                Name = folderName,
                                 Path = gameFolder,
                                 Executable = executablePath,
+                                InstallDirectory = exeDir,
                                 Platform = GamePlatform.Xbox
                             };
 
@@ -270,12 +329,53 @@ public class GameScannerService : IGameScannerService
                             GameDiscovered?.Invoke(this, game);
                         }
                     }
-                }
-                catch (UnauthorizedAccessException)
+                }, cancellationToken);
+            }
+
+            // Also check WindowsApps folder (Microsoft Store apps)
+            var windowsAppsPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+                "WindowsApps");
+
+            if (Directory.Exists(windowsAppsPath))
+            {
+                await Task.Run(() =>
                 {
-                    Debug.WriteLine("Xbox: Insufficient permissions for WindowsApps folder");
-                }
-            }, cancellationToken);
+                    try
+                    {
+                        foreach (var gameFolder in Directory.GetDirectories(windowsAppsPath))
+                        {
+                            if (cancellationToken.IsCancellationRequested)
+                                break;
+
+                            var folderName = Path.GetFileName(gameFolder);
+                            if (folderName.StartsWith("Microsoft.") || folderName.StartsWith("Windows."))
+                                continue;
+
+                            var executablePath = FindGameExecutableInPath(gameFolder);
+                            if (!string.IsNullOrEmpty(executablePath))
+                            {
+                                var game = new GameInfo
+                                {
+                                    Name = folderName.Split('_')[0],
+                                    Path = gameFolder,
+                                    Executable = executablePath,
+                                    InstallDirectory = Path.GetDirectoryName(executablePath) ?? gameFolder,
+                                    Platform = GamePlatform.Xbox
+                                };
+
+                                RefreshModStatusAsync(game).Wait();
+                                games.Add(game);
+                                GameDiscovered?.Invoke(this, game);
+                            }
+                        }
+                    }
+                    catch (UnauthorizedAccessException)
+                    {
+                        Debug.WriteLine("Xbox: Insufficient permissions for WindowsApps folder");
+                    }
+                }, cancellationToken);
+            }
         }
         catch (Exception ex)
         {
@@ -325,6 +425,7 @@ public class GameScannerService : IGameScannerService
                                 Name = gameName ?? Path.GetFileName(gamePath),
                                 Path = gamePath,
                                 Executable = executablePath,
+                                InstallDirectory = Path.GetDirectoryName(executablePath) ?? gamePath,
                                 Platform = GamePlatform.GOG
                             };
 
@@ -423,6 +524,7 @@ public class GameScannerService : IGameScannerService
                         Name = Path.GetFileName(gameFolder),
                         Path = gameFolder,
                         Executable = executablePath,
+                        InstallDirectory = Path.GetDirectoryName(executablePath) ?? gameFolder,
                         Platform = platform
                     };
 
@@ -470,6 +572,112 @@ public class GameScannerService : IGameScannerService
         return null;
     }
 
+    private string? FindXboxGameExecutable(string gamePath)
+    {
+        try
+        {
+            Debug.WriteLine($"[GameScanner] Searching Xbox executable in: {gamePath}");
+            
+            var allExecutables = Directory.GetFiles(gamePath, "*.exe", SearchOption.AllDirectories)
+                .Where(f => !IsSystemExecutable(f) && !IsXboxHelperExecutable(f))
+                .ToArray();
+
+            Debug.WriteLine($"[GameScanner] Found {allExecutables.Length} potential executables");
+            foreach (var exe in allExecutables)
+            {
+                Debug.WriteLine($"[GameScanner]   - {exe}");
+            }
+
+            if (allExecutables.Length == 0)
+                return null;
+
+            // Priority 1: WinGDK executables (Xbox Game Pass games)
+            var wingdkExecutables = allExecutables.Where(e =>
+            {
+                var dirName = Path.GetDirectoryName(e) ?? "";
+                var fileName = Path.GetFileName(e);
+                return dirName.Contains("WinGDK", StringComparison.OrdinalIgnoreCase) ||
+                       fileName.Contains("WinGDK", StringComparison.OrdinalIgnoreCase);
+            }).ToArray();
+
+            if (wingdkExecutables.Length > 0)
+            {
+                var shippingExe = wingdkExecutables.FirstOrDefault(e =>
+                    Path.GetFileName(e).Contains("Shipping", StringComparison.OrdinalIgnoreCase));
+                if (shippingExe != null)
+                {
+                    Debug.WriteLine($"[GameScanner] Selected WinGDK Shipping executable: {shippingExe}");
+                    return shippingExe;
+                }
+                
+                Debug.WriteLine($"[GameScanner] Selected WinGDK executable: {wingdkExecutables[0]}");
+                return wingdkExecutables[0];
+            }
+
+            // Priority 2: Executables in Binaries folder
+            var binariesExecutables = allExecutables.Where(e =>
+            {
+                var dirName = Path.GetDirectoryName(e) ?? "";
+                return dirName.Contains("Binaries", StringComparison.OrdinalIgnoreCase);
+            }).ToArray();
+
+            if (binariesExecutables.Length > 0)
+            {
+                var selected = binariesExecutables.OrderBy(f => f.Length).First();
+                Debug.WriteLine($"[GameScanner] Selected Binaries executable: {selected}");
+                return selected;
+            }
+
+            // Priority 3: Avoid helper/launcher executables
+            var gameExecutables = allExecutables.Where(e =>
+            {
+                var fileName = Path.GetFileName(e).ToLowerInvariant();
+                return !fileName.Contains("helper") && 
+                       !fileName.Contains("launcher") && 
+                       !fileName.Contains("crashhandler") &&
+                       !fileName.Contains("unins");
+            }).ToArray();
+
+            if (gameExecutables.Length > 0)
+            {
+                var gameFolderName = Path.GetFileName(gamePath).ToLowerInvariant();
+                var matchingExe = gameExecutables.FirstOrDefault(e =>
+                {
+                    var fileName = Path.GetFileNameWithoutExtension(e).ToLowerInvariant();
+                    return fileName.Contains(gameFolderName) || gameFolderName.Contains(fileName);
+                });
+
+                if (matchingExe != null)
+                {
+                    Debug.WriteLine($"[GameScanner] Selected matching executable: {matchingExe}");
+                    return matchingExe;
+                }
+
+                var selected = gameExecutables[0];
+                Debug.WriteLine($"[GameScanner] Selected fallback executable: {selected}");
+                return selected;
+            }
+
+            var lastResort = allExecutables.OrderBy(f => f.Length).First();
+            Debug.WriteLine($"[GameScanner] Selected last resort executable: {lastResort}");
+            return lastResort;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[GameScanner] Error finding Xbox executable in {gamePath}: {ex.Message}");
+            return null;
+        }
+    }
+
+    private bool IsXboxHelperExecutable(string exePath)
+    {
+        var fileName = Path.GetFileName(exePath).ToLowerInvariant();
+        return fileName.Contains("gamelaunchhelper") ||
+               fileName.Contains("gamingrepairtool") ||
+               fileName.Contains("gamingrepair") ||
+               fileName.Contains("ueprereqsetup");
+    }
+
     private bool IsSystemExecutable(string exePath)
     {
         var fileName = Path.GetFileName(exePath).ToLowerInvariant();
@@ -483,16 +691,23 @@ public class GameScannerService : IGameScannerService
 
     private bool CheckForOptiScalerMod(string gamePath)
     {
-        // Check for OptiScaler DLL files in game directory
-        var optiScalerFiles = new[] { "nvngx.dll", "libxess.dll", "amd_fidelityfx_vk.dll" };
+        // Check for OptiScaler DLL files in game directory (updated for 0.7.9+ complete)
+        var optiScalerFiles = new[] { 
+            "OptiScaler.dll",                          // 0.7.9+ main DLL
+            "nvngx.dll",                               // Legacy (older versions)
+            "libxess.dll",                             // XeSS library
+            "libxess_dx11.dll",                        // XeSS DX11 library
+            "amd_fidelityfx_vk.dll",                   // AMD FSR (Vulkan)
+            "amd_fidelityfx_dx12.dll",                 // AMD FSR (DirectX 12)
+            "amd_fidelityfx_upscaler_dx12.dll",        // AMD FSR Upscaler (DX12)
+            "amd_fidelityfx_framegeneration_dx12.dll"  // AMD FSR Frame Generation (DX12)
+        };
         
         foreach (var file in optiScalerFiles)
         {
             var filePath = Path.Combine(gamePath, file);
             if (File.Exists(filePath))
             {
-                // Additional verification: check file metadata or signature
-                // For now, simple file existence check
                 return true;
             }
         }
@@ -500,19 +715,121 @@ public class GameScannerService : IGameScannerService
         return false;
     }
 
-    private bool CheckForDlssgToFsr3Mod(string gamePath)
+    private bool CheckForOptiPatcherMod(string gamePath)
     {
-        // Check for DLSSG-to-FSR3 specific files
-        var dlssgFiles = new[] { "dlssg_to_fsr3.dll", "nvngx_dlssg.dll" };
+        // Check for OptiPatcher ASI plugin files
+        var optiPatcherFiles = new[] { "OptiPatcher.asi", "nvngx_patch.dll" };
         
-        foreach (var file in dlssgFiles)
+        // Check in plugins folder first
+        var pluginsPath = Path.Combine(gamePath, "plugins");
+        if (Directory.Exists(pluginsPath))
+        {
+            foreach (var file in optiPatcherFiles)
+            {
+                var filePath = Path.Combine(pluginsPath, file);
+                if (File.Exists(filePath))
+                {
+                    Debug.WriteLine($"[GameScanner] Found OptiPatcher in plugins: {filePath}");
+                    return true;
+                }
+            }
+        }
+        
+        // Check in game root directory
+        foreach (var file in optiPatcherFiles)
         {
             var filePath = Path.Combine(gamePath, file);
             if (File.Exists(filePath))
+            {
+                Debug.WriteLine($"[GameScanner] Found OptiPatcher in root: {filePath}");
                 return true;
+            }
+        }
+        
+        // Also check recursively for any .asi files that start with OptiPatcher
+        try
+        {
+            var allAsiFiles = Directory.GetFiles(gamePath, "*.asi", SearchOption.AllDirectories);
+            foreach (var asiFile in allAsiFiles)
+            {
+                var fileName = Path.GetFileName(asiFile);
+                if (fileName.StartsWith("OptiPatcher", StringComparison.OrdinalIgnoreCase))
+                {
+                    Debug.WriteLine($"[GameScanner] Found OptiPatcher variant: {asiFile}");
+                    return true;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[GameScanner] Error checking for OptiPatcher recursively: {ex.Message}");
         }
 
         return false;
+    }
+
+    private void ReadOptiScalerConfiguration(GameInfo game, string installDir)
+    {
+        try
+        {
+            var iniPath = Path.Combine(installDir, "OptiScaler.ini");
+            if (!File.Exists(iniPath))
+            {
+                SetDefaultConfiguration(game, installDir);
+                return;
+            }
+
+            var configService = new OptiScalerConfigService();
+            var config = configService.ReadConfig(iniPath);
+
+            game.UpscalingMethod = config.GetUpscalerDisplayName();
+            game.HasFrameGeneration = config.IsFrameGenerationEnabled();
+            game.QualityPreset = config.GetQualityPresetName();
+
+            Debug.WriteLine($"[GameScanner] Read OptiScaler config - Upscaler: {game.UpscalingMethod}, FG: {game.HasFrameGeneration}, Quality: {game.QualityPreset}");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[GameScanner] Error reading OptiScaler config: {ex.Message}");
+            SetDefaultConfiguration(game, installDir);
+        }
+    }
+
+    private void SetDefaultConfiguration(GameInfo game, string installDir)
+    {
+        if (File.Exists(Path.Combine(installDir, "libxess.dll")))
+        {
+            game.UpscalingMethod = "XeSS";
+        }
+        else if (File.Exists(Path.Combine(installDir, "amd_fidelityfx_dx12.dll")))
+        {
+            if (File.Exists(Path.Combine(installDir, "amd_fidelityfx_framegeneration_dx12.dll")))
+            {
+                game.UpscalingMethod = "FSR 3";
+                game.HasFrameGeneration = true;
+            }
+            else
+            {
+                game.UpscalingMethod = "FSR 2";
+            }
+        }
+        else if (File.Exists(Path.Combine(installDir, "nvngx.dll")))
+        {
+            game.UpscalingMethod = "DLSS";
+            if (game.HasOptiPatcher)
+            {
+                game.HasFrameGeneration = true;
+            }
+        }
+        else
+        {
+            game.UpscalingMethod = "Auto";
+        }
+
+        if (string.IsNullOrEmpty(game.QualityPreset))
+        {
+            game.QualityPreset = "Quality";
+        }
     }
 
     [SupportedOSPlatform("windows")]

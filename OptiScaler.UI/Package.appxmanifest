@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap uap3 rescap mp">
+
+  <Identity
+    Name="Bigflood92.OptiScalerManager"
+    Publisher="CN=Bigflood92"
+    Version="0.1.0.0" />
+
+  <mp:PhoneIdentity PhoneProductId="e8b5c8d9-4f2a-4e1b-8c3d-9a7b6c5d4e3f" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+
+  <Properties>
+    <DisplayName>OptiScaler Manager</DisplayName>
+    <PublisherDisplayName>Bigflood92</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+    <Description>Modern Windows app for game optimization with FSR3 and DLSS mods. Manage upscaling, frame generation, and graphics settings for your games.</Description>
+    <uap:SupportUrl>https://github.com/Bigflood92/OptiScaler-Manager</uap:SupportUrl>
+    <PrivacyPolicy>https://bigflood92.github.io/OptiScaler-Manager/PrivacyPolicy.html</PrivacyPolicy>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="x-generate"/>
+  </Resources>
+
+  <Applications>
+    <Application Id="App"
+      Executable="$targetnametoken$.exe"
+      EntryPoint="$targetentrypoint$">
+      <uap:VisualElements
+        DisplayName="OptiScaler Manager"
+        Description="Manage DLSS, FSR, and XeSS upscaling mods for your games"
+        BackgroundColor="transparent"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png">
+        <uap:DefaultTile 
+          Wide310x150Logo="Assets\Wide310x150Logo.png"
+          Square310x310Logo="Assets\LargeTile.png"
+          Square71x71Logo="Assets\SmallTile.png"
+          ShortName="OptiScaler">
+          <uap:ShowNameOnTiles>
+            <uap:ShowOn Tile="square150x150Logo"/>
+            <uap:ShowOn Tile="wide310x150Logo"/>
+            <uap:ShowOn Tile="square310x310Logo"/>
+          </uap:ShowNameOnTiles>
+        </uap:DefaultTile>
+        <uap:SplashScreen Image="Assets\SplashScreen.png" BackgroundColor="#0A0A0A"/>
+        <uap:LockScreen Notification="badge" BadgeLogo="Assets\BadgeLogo.png"/>
+        <uap:InitialRotationPreference>
+          <uap:Rotation Preference="landscape"/>
+        </uap:InitialRotationPreference>
+      </uap:VisualElements>
+
+      <Extensions>
+        <!-- Protocol activation for deep linking -->
+        <uap:Extension Category="windows.protocol">
+          <uap:Protocol Name="optiscaler">
+            <uap:DisplayName>OptiScaler Manager Protocol</uap:DisplayName>
+          </uap:Protocol>
+        </uap:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <Capability Name="internetClient" />
+    <rescap:Capability Name="runFullTrust" />
+    <rescap:Capability Name="broadFileSystemAccess" />
+  </Capabilities>
+</Package>

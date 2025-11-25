@@ -1,148 +1,32 @@
-# OptiScaler Manager
+# OptiScaler Manager (WinUI 3)
 
-> **⚡ Modern Windows App for Game Optimization** - Built with .NET 8 & WinUI 3
+> Private Repository - Distributed exclusively via Microsoft Store
 
-![Version](https://img.shields.io/badge/version-0.0.1-blue)
-![Framework](https://img.shields.io/badge/.NET-8.0-purple)
-![UI](https://img.shields.io/badge/UI-WinUI_3-green)
-![Platform](https://img.shields.io/badge/platform-Windows_10/11-lightgrey)
+Modern Windows app for managing upscaling mods (DLSS, FSR, XeSS) for PC games.
 
-## 🎯 **About**
+## About
 
-**OptiScaler Manager** is the next-generation evolution of the popular OptiScaler tool, completely rewritten for modern Windows with Microsoft Store distribution and Xbox Game Bar integration.
+Complete rewrite of the Python version with .NET 8 and WinUI 3.
 
-## 🚀 **Key Features**
+### Features
+- Auto game detection (Steam/Epic/EA/Xbox)
+- One-click mod installation
+- DLSS, FSR 2/3, XeSS support
+- Xbox-style UI with gamepad support
+- Zero telemetry - privacy first
 
-### **✨ Current (Python Version) Features**
-- 🎮 **Auto Game Detection** - Steam, Epic, Xbox Game Pass, GOG
-- 📥 **One-Click Mod Installation** - OptiScaler & DLSSG-to-FSR3
-- ⚙️ **Smart Configuration** - Performance/Balanced/Quality presets
-- 🔄 **Auto-Updates** - Latest mods and app versions
-- 🖥️ **GPU Detection** - NVIDIA/AMD/Intel optimization
+## Tech Stack
+- .NET 8
+- WinUI 3 (Windows App SDK 1.8)
+- MVVM pattern
+- Self-contained deployment
 
-### **🆕 New (.NET Version) Features**
-- 🏪 **Microsoft Store** - Official distribution channel
-- 🎮 **Xbox Game Bar** - Overlay integration (Win+G)
-- 🎨 **Modern UI** - Native Windows 11 design
-- 📦 **MSIX Packaging** - Secure, sandboxed installation
-- ⚡ **Better Performance** - Native .NET runtime
+## Distribution
+Microsoft Store only - No public releases
 
-## 🏗️ **Project Structure**
-
-```
-OptiScaler Manager/
-├── 📄 OptiScaler.Manager.sln      # Visual Studio Solution
-├── 🔧 OptiScaler.Core/            # Business Logic & Services
-│   ├── Services/                  # Game scanning, GitHub API, etc.
-│   ├── Models/                    # Data models
-│   └── Contracts/                 # Interfaces
-├── 🎨 OptiScaler.UI/              # WinUI 3 User Interface
-│   ├── Views/                     # XAML Pages
-│   ├── ViewModels/                # MVVM Pattern
-│   └── Controls/                  # Custom Controls
-├── 📦 OptiScaler.Package/         # MSIX Packaging (Future)
-└── 📚 docs/                       # Documentation
-```
-
-## 🎨 **Technology Stack**
-
-| 🏷️ **Component** | 🔧 **Technology** | 📋 **Purpose** |
-|------------------|------------------|---------------|
-| **Runtime** | .NET 8 LTS | Long-term support & performance |
-| **UI Framework** | WinUI 3 | Native Windows experience |
-| **Architecture** | MVVM | Clean separation of concerns |
-| **Packaging** | MSIX | Modern app deployment |
-| **Distribution** | Microsoft Store | Official channel |
-
-## 🚀 **Development Roadmap**
-
-| 🏁 **Version** | 🎯 **Milestone** | 📅 **Target** | ✅ **Status** |
-|---------------|-----------------|---------------|--------------|
-| **v0.0.1** | Project setup + Core Services | Week 1 | ✅ **Complete** |
-| **v0.1.0** | WinUI 3 interface design | Week 2 | ⏳ Planned |
-| **v0.2.0** | Testing & refinement | Week 3 | ⏳ Planned |
-| **v0.3.0** | Xbox Game Bar integration | Week 4 | ⏳ Planned |
-| **v0.4.0** | MSIX packaging | Week 5 | ⏳ Planned |
-| **v1.0.0** | Microsoft Store release | Week 6 | ⏳ Planned |
-
-## 🛠️ **Development Setup**
-
-### **Prerequisites**
-- Visual Studio 2022 Community (recommended) or VS Code
-- .NET 8 SDK
-- Windows 10 version 1903+ or Windows 11
-- Windows App SDK
-
-## 🏪 **Distribution Strategy**
-
-**OptiScaler Manager** is designed exclusively for **Microsoft Store** distribution:
-
-- 🎯 **Primary Channel**: Microsoft Store (MSIX)
-- 🔒 **Private Development**: Local development only
-- ✅ **Official Distribution**: No GitHub releases
-- 🛡️ **Secure Installation**: MSIX sandboxing and certificates
-- 🔄 **Auto-Updates**: Through Microsoft Store
-
-### **📋 Relationship with Original**
-
-| 🏷️ **Product** | 🚀 **Distribution** | 🎯 **Purpose** | 👥 **Audience** |
-|----------------|-------------------|---------------|-----------------|
-| **OptiScaler (Python)** | GitHub Releases | Open Source Tool | Power Users |
-| **OptiScaler Manager** | Microsoft Store | Premium App | General Users |
-
-## �️ **Development Setup**
-
-### **Prerequisites**
-- Visual Studio 2022 Community (recommended) or VS Code
-- .NET 8 SDK
-- Windows 10 version 1903+ or Windows 11
-- Windows App SDK
-- Microsoft Store developer account (for publishing)
-
-### **Local Development**
-
-```bash
-# Navigate to project directory
-cd "OptiScaler Manager"
-
-# Restore packages
-dotnet restore
-
-# Build solution
-dotnet build
-
-# Run application
-dotnet run --project OptiScaler.UI
-```
-
-### **MSIX Packaging for Store**
-
-```bash
-# Build for store submission
-dotnet publish -c Release -f net8.0-windows10.0.19041.0
-
-# Package with Visual Studio or
-# Use Windows Application Packaging Project
-```
-
-## 🤝 **Contributing**
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 **License**
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 **Acknowledgments**
-
-- Original OptiScaler community for feedback and testing
-- Microsoft for WinUI 3 and Windows App SDK
-- All contributors who help make this project better
+## Documentation
+- Privacy Policy: https://bigflood92.github.io/OptiScaler-Manager-WinUI/PrivacyPolicy.html
 
 ---
 
-**🎮 Transform your gaming experience with modern Windows optimization tools!**
+Copyright 2025 Bigflood92 - All rights reserved

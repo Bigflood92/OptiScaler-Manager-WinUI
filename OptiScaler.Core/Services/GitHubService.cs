@@ -1,8 +1,11 @@
 using System.Diagnostics;
+using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using OptiScaler.Core.Contracts;
 using OptiScaler.Core.Models;
+using SharpCompress.Archives;
+using SharpCompress.Common;
 
 namespace OptiScaler.Core.Services;
 
@@ -19,8 +22,8 @@ public class GitHubService : IGitHubService, IDisposable
     // Default repositories for known mod types
     private static readonly Dictionary<ModType, (string Owner, string Repo)> ModRepositories = new()
     {
-        { ModType.OptiScaler, ("cdozdil", "OptiScaler") },
-        { ModType.DlssgToFsr3, ("Nukem9", "dlssg-to-fsr3") }
+        { ModType.OptiScaler, ("optiscaler", "OptiScaler") },
+        { ModType.OptiPatcher, ("optiscaler", "OptiPatcher") }
     };
 
     public GitHubService()
@@ -101,6 +104,8 @@ public class GitHubService : IGitHubService, IDisposable
     {
         try
         {
+            Debug.WriteLine($"[GitHub] Start download: {asset.Name} from {asset.BrowserDownloadUrl}");
+            
             // Ensure directory exists
             var directory = Path.GetDirectoryName(destinationPath);
             if (!string.IsNullOrEmpty(directory))
@@ -110,12 +115,18 @@ public class GitHubService : IGitHubService, IDisposable
             long lastBytesReceived = 0;
             var lastUpdateTime = DateTime.Now;
 
+            Debug.WriteLine($"[GitHub] Sending GET request...");
             using var response = await _httpClient.GetAsync(asset.BrowserDownloadUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+            
+            Debug.WriteLine($"[GitHub] Response status: {response.StatusCode}");
             response.EnsureSuccessStatusCode();
 
             var totalBytes = response.Content.Headers.ContentLength ?? asset.Size;
+            Debug.WriteLine($"[GitHub] Content-Length: {totalBytes} bytes");
 
             using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken);
+            Debug.WriteLine($"[GitHub] Begin reading stream...");
+            
             using var fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true);
 
             var buffer = new byte[8192];
@@ -157,11 +168,25 @@ public class GitHubService : IGitHubService, IDisposable
                 SpeedBytesPerSecond = 0
             });
 
+            Debug.WriteLine($"[GitHub] Download complete: {totalBytesRead} bytes written to {destinationPath}");
             return destinationPath;
+        }
+        catch (HttpRequestException httpEx)
+        {
+            Debug.WriteLine($"[GitHub] HTTP error downloading {asset.Name}: {httpEx.Message}");
+            
+            // Clean up partial download
+            if (File.Exists(destinationPath))
+            {
+                try { File.Delete(destinationPath); } catch { }
+            }
+
+            throw;
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Error downloading asset: {ex.Message}");
+            Debug.WriteLine($"[GitHub] Error downloading {asset.Name}: {ex.Message}");
+            Debug.WriteLine($"[GitHub] Stack trace: {ex.StackTrace}");
             
             // Clean up partial download
             if (File.Exists(destinationPath))
@@ -178,39 +203,117 @@ public class GitHubService : IGitHubService, IDisposable
     /// </summary>
     public async Task<(string FilePath, GitHubRelease Release)?> DownloadLatestModAsync(ModType modType, string destinationPath, CancellationToken cancellationToken = default)
     {
-        if (!ModRepositories.TryGetValue(modType, out var repo))
+        try
         {
-            Debug.WriteLine($"Unknown mod type: {modType}");
+            var (owner, repo) = GetModRepository(modType);
+            var release = await GetLatestReleaseAsync(owner, repo, cancellationToken);
+            
+            if (release == null)
+                return null;
+
+            // Select preferred asset (.7z for OptiScaler, .asi for OptiPatcher)
+            GitHubAsset? asset = null;
+            if (modType == ModType.OptiScaler)
+            {
+                asset = release.Assets.FirstOrDefault(a => a.Name.EndsWith(".7z", StringComparison.OrdinalIgnoreCase))
+                     ?? release.Assets.FirstOrDefault(a => a.Name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
+                     ?? release.Assets.FirstOrDefault();
+            }
+            else if (modType == ModType.OptiPatcher)
+            {
+                asset = release.Assets.FirstOrDefault(a => a.Name.EndsWith(".asi", StringComparison.OrdinalIgnoreCase))
+                     ?? release.Assets.FirstOrDefault();
+            }
+
+            if (asset == null)
+                return null;
+
+            // Download the archive
+            await DownloadAssetAsync(asset, destinationPath, cancellationToken);
+            
+            // Extract immediately if it's an archive
+            var extractedPath = await ExtractArchiveIfNeeded(destinationPath, modType, cancellationToken);
+            
+            return (extractedPath, release);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Download latest mod error: {ex}");
             return null;
         }
+    }
 
-        var release = await GetLatestReleaseAsync(repo.Owner, repo.Repo, cancellationToken);
-        if (release == null)
+    /// <summary>
+    /// Extract archive and return path to extracted content
+    /// </summary>
+    private async Task<string> ExtractArchiveIfNeeded(string archivePath, ModType modType, CancellationToken cancellationToken)
+    {
+        var fileExt = Path.GetExtension(archivePath).ToLowerInvariant();
+        
+        // Only extract archives, return as-is for single files
+        if (fileExt != ".7z" && fileExt != ".zip")
         {
-            Debug.WriteLine($"No release found for {modType}");
-            return null;
+            Debug.WriteLine($"[GitHub] Not an archive, returning original path: {archivePath}");
+            return archivePath;
         }
 
-        // Find the appropriate asset to download
-        // Prefer .zip files, fallback to first asset
-        var asset = release.Assets.FirstOrDefault(a => a.Name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
-                    ?? release.Assets.FirstOrDefault();
-
-        if (asset == null)
+        // Create extraction directory next to archive
+        var archiveDir = Path.GetDirectoryName(archivePath) ?? Path.GetTempPath();
+        var archiveName = Path.GetFileNameWithoutExtension(archivePath);
+        var extractDir = Path.Combine(archiveDir, $"{archiveName}_extracted");
+        
+        // Check if already extracted
+        if (Directory.Exists(extractDir))
         {
-            Debug.WriteLine($"No downloadable assets found in release");
-            return null;
+            Debug.WriteLine($"[GitHub] Archive already extracted: {extractDir}");
+            return extractDir;
         }
 
-        // Ensure destination path has proper extension
-        if (string.IsNullOrEmpty(Path.GetExtension(destinationPath)))
+        Debug.WriteLine($"[GitHub] Extracting {archivePath} to {extractDir}");
+        
+        try
         {
-            var extension = Path.GetExtension(asset.Name);
-            destinationPath = Path.ChangeExtension(destinationPath, extension);
+            Directory.CreateDirectory(extractDir);
+            
+            // Use SharpCompress for extraction
+            using var stream = File.OpenRead(archivePath);
+            using var archive = SharpCompress.Archives.ArchiveFactory.Open(stream);
+            
+            await Task.Run(() =>
+            {
+                foreach (var entry in archive.Entries.Where(e => !e.IsDirectory))
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    
+                    var destPath = Path.Combine(extractDir, entry.Key.Replace('/', Path.DirectorySeparatorChar));
+                    var destDirPath = Path.GetDirectoryName(destPath);
+                    
+                    if (!string.IsNullOrEmpty(destDirPath) && !Directory.Exists(destDirPath))
+                    {
+                        Directory.CreateDirectory(destDirPath);
+                    }
+                    
+                    entry.WriteToFile(destPath, new SharpCompress.Common.ExtractionOptions { ExtractFullPath = true, Overwrite = true });
+                    Debug.WriteLine($"[GitHub] Extracted: {entry.Key} -> {destPath}");
+                }
+            }, cancellationToken);
+            
+            Debug.WriteLine($"[GitHub] Extraction complete: {extractDir}");
+            return extractDir;
         }
-
-        var downloadedPath = await DownloadAssetAsync(asset, destinationPath, cancellationToken);
-        return (downloadedPath, release);
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[GitHub] Extraction failed: {ex.Message}");
+            
+            // Clean up failed extraction
+            if (Directory.Exists(extractDir))
+            {
+                try { Directory.Delete(extractDir, true); } catch { }
+            }
+            
+            // Return original archive path as fallback
+            return archivePath;
+        }
     }
 
     /// <summary>

@@ -1,8 +1,11 @@
 using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using OptiScaler.UI.ViewModels;
 using OptiScaler.Core.Models;
+using OptiScaler.UI.Dialogs;
 
 namespace OptiScaler.UI.Views;
 
@@ -14,55 +17,112 @@ public sealed partial class GamesPage : Page
     {
         this.InitializeComponent();
         ViewModel = new GamesViewModel();
+        this.DataContext = ViewModel;
+        System.Diagnostics.Debug.WriteLine("[GamesPage] Page initialized successfully");
     }
 
     private async void ScanGames_Click(object sender, RoutedEventArgs e)
     {
         await ViewModel.ScanGamesCommand.ExecuteAsync(null);
-    }
-
-    private void Refresh_Click(object sender, RoutedEventArgs e)
-    {
-        ViewModel.RefreshCommand.Execute(null);
+        if (ViewModel.Games.Any() && sender is Button button)
+        {
+            var stackPanel = button.Content as StackPanel;
+            if (stackPanel != null)
+            {
+                foreach (var child in stackPanel.Children)
+                {
+                    if (child is TextBlock tb) tb.Text = "Refresh";
+                    else if (child is FontIcon icon) icon.Glyph = "\uE72C";
+                }
+            }
+        }
     }
 
     private async void InstallMod_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is Button button && button.Tag is GameInfo game)
+        try
         {
-            await ViewModel.InstallModCommand.ExecuteAsync(game);
+            if (sender is Button button && button.Tag is GameInfo game)
+            {
+                await ViewModel.InstallModCommand.ExecuteAsync(game);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[GamesPage] InstallMod_Click error: {ex}");
         }
     }
 
     private async void UninstallMod_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is Button button && button.Tag is GameInfo game)
+        try
         {
-            await ViewModel.UninstallModCommand.ExecuteAsync(game);
+            if (sender is Button button && button.Tag is GameInfo game)
+            {
+                await ViewModel.UninstallModCommand.ExecuteAsync(game);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[GamesPage] UninstallMod_Click error: {ex}");
         }
     }
 
     private async void Launch_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is Button button && button.Tag is GameInfo game)
+        try
         {
-            await ViewModel.LaunchGameCommand.ExecuteAsync(game);
+            if (sender is Button button && button.Tag is GameInfo game)
+            {
+                await ViewModel.LaunchGameCommand.ExecuteAsync(game);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[GamesPage] Launch_Click error: {ex}");
         }
     }
 
     private void ShowDetails_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is Button button && button.Tag is GameInfo game)
+        try
         {
-            ViewModel.ShowGameDetailsCommand.Execute(game);
+            if (sender is Button button && button.Tag is GameInfo game)
+            {
+                ViewModel.ShowGameDetailsCommand.Execute(game);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[GamesPage] ShowDetails_Click error: {ex}");
         }
     }
 
-    private void ShowSettings_Click(object sender, RoutedEventArgs e)
+    private async void ShowSettings_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is Button button && button.Tag is GameInfo game)
+        try
         {
-            ViewModel.ShowGameSettingsCommand.Execute(game);
+            if (sender is Button button && button.Tag is GameInfo game)
+            {
+                // Open game configuration dialog
+                var dialog = new GameConfigDialog
+                {
+                    Game = game,
+                    XamlRoot = this.XamlRoot
+                };
+
+                var result = await dialog.ShowAsync();
+
+                // If changes were made, refresh the game list
+                if (dialog.HasChanges)
+                {
+                    await ViewModel.RefreshGameAsync(game);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[GamesPage] ShowSettings_Click error: {ex}");
         }
     }
 }

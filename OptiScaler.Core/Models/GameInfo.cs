@@ -1,4 +1,6 @@
+using System;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace OptiScaler.Core.Models;
 
@@ -10,10 +12,16 @@ public class GameInfo : INotifyPropertyChanged
     private string _name = string.Empty;
     private string _path = string.Empty;
     private string _executable = string.Empty;
+    private string _installDirectory = string.Empty;
     private GamePlatform _platform = GamePlatform.Unknown;
     private bool _hasOptiscaler;
-    private bool _hasDlssgToFsr3;
+    private bool _hasOptiPatcher;
     private DateTime _lastScanned = DateTime.Now;
+    private string? _upscalingMethod;
+    private bool _hasFrameGeneration;
+    private string? _qualityPreset;
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     /// <summary>
     /// Game display name
@@ -25,7 +33,7 @@ public class GameInfo : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Game installation directory path
+    /// Game installation directory path (root folder)
     /// </summary>
     public string Path
     {
@@ -34,12 +42,24 @@ public class GameInfo : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Main game executable file path
+    /// Main game executable file path (full path to .exe)
     /// </summary>
     public string Executable
     {
         get => _executable;
         set => SetProperty(ref _executable, value);
+    }
+
+    /// <summary>
+    /// Directory where the game executable is located (where mods should be installed)
+    /// This is the directory containing the .exe file, NOT the game root folder
+    /// Example: For C:\XboxGames\Keeper\Content\PaganIdol\Binaries\WinGDK\game.exe
+    /// This would be: C:\XboxGames\Keeper\Content\PaganIdol\Binaries\WinGDK
+    /// </summary>
+    public string InstallDirectory
+    {
+        get => _installDirectory;
+        set => SetProperty(ref _installDirectory, value);
     }
 
     /// <summary>
@@ -61,12 +81,12 @@ public class GameInfo : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Whether DLSSG-to-FSR3 mod is installed
+    /// Whether OptiPatcher (ASI plugin) is installed
     /// </summary>
-    public bool HasDlssgToFsr3
+    public bool HasOptiPatcher
     {
-        get => _hasDlssgToFsr3;
-        set => SetProperty(ref _hasDlssgToFsr3, value);
+        get => _hasOptiPatcher;
+        set => SetProperty(ref _hasOptiPatcher, value);
     }
 
     /// <summary>
@@ -79,25 +99,44 @@ public class GameInfo : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Unique identifier for this game installation
+    /// OptiScaler upscaling method currently configured (e.g., "DLSS 3.7", "XeSS", "FSR")
     /// </summary>
-    public string Id => $"{Platform}_{Name}_{Path.GetHashCode()}";
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    protected virtual void OnPropertyChanged(string propertyName)
+    public string? UpscalingMethod
     {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        get => _upscalingMethod;
+        set => SetProperty(ref _upscalingMethod, value);
     }
 
-    protected bool SetProperty<T>(ref T field, T value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
+    /// <summary>
+    /// Whether frame generation is enabled
+    /// </summary>
+    public bool HasFrameGeneration
     {
-        if (EqualityComparer<T>.Default.Equals(field, value))
-            return false;
+        get => _hasFrameGeneration;
+        set => SetProperty(ref _hasFrameGeneration, value);
+    }
 
-        field = value;
-        OnPropertyChanged(propertyName);
-        return true;
+    /// <summary>
+    /// Quality preset being used (e.g., "Quality", "Balanced", "Performance")
+    /// </summary>
+    public string? QualityPreset
+    {
+        get => _qualityPreset;
+        set => SetProperty(ref _qualityPreset, value);
+    }
+
+    /// <summary>
+    /// Display path for UI (shows InstallDirectory if available, otherwise Path)
+    /// </summary>
+    public string DisplayPath => !string.IsNullOrEmpty(InstallDirectory) ? InstallDirectory : Path;
+
+    protected void SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    {
+        if (!Equals(field, value))
+        {
+            field = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }
 
