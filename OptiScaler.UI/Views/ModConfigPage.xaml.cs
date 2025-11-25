@@ -13,6 +13,8 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Text;
 using Microsoft.UI;
 using IOPath = System.IO.Path;
+using OptiScaler.UI.ViewModels;
+using OptiScaler.UI.Services;
 
 namespace OptiScaler.UI.Views;
 
@@ -29,13 +31,26 @@ public sealed partial class ModConfigPage : Page
     private bool _advancedLoaded;
     private string _activePreset = "default"; // Track active preset
 
+    public OptiScalerConfigViewModel ViewModel { get; }
+
     public ModConfigPage()
     {
         InitializeComponent();
+        ViewModel = new OptiScalerConfigViewModel();
+        
+        // Setup navigation
+        this.Loaded += OnPageLoaded;
+
         _globalSettingsService = new GlobalSettingsService();
         _storageService = new StorageService();
         _currentSettings = new GlobalSettings();
         Loaded += ModConfigPage_LoadedAsync; // use async handler
+    }
+
+    private void OnPageLoaded(object sender, RoutedEventArgs e)
+    {
+        // Setup complete navigation support
+        InputNavigationService.SetupPageNavigation(this, onRefresh: null, onSettings: null);
     }
 
     private async void ModConfigPage_LoadedAsync(object sender, RoutedEventArgs e)
@@ -517,31 +532,31 @@ public sealed partial class ModConfigPage : Page
             dllCombo.SelectedIndex = idx >= 0 ? idx : 0;
         }
         var vfov = GetCtrl<TextBox>("VerticalFovTextBox"); if (vfov != null) vfov.Text = _currentSettings.VerticalFovOverride > 0 ? _currentSettings.VerticalFovOverride.ToString("F1") : "0";
-        SetToggle("AdvSharpnessOverrideToggle", _currentSettings.SharpnessOverrideEnabled);
-        SetText("AdvSharpnessValueTextBox", _currentSettings.SharpnessOverrideEnabled ? _currentSettings.SharpnessValue : 0.3f);
+        setToggle("AdvSharpnessOverrideToggle", _currentSettings.SharpnessOverrideEnabled);
+        setText("AdvSharpnessValueTextBox", _currentSettings.SharpnessOverrideEnabled ? _currentSettings.SharpnessValue : 0.3f);
         var advLog = GetCtrl<ComboBox>("AdvLogLevelComboBox"); if (advLog != null) advLog.SelectedIndex = Math.Clamp(_currentSettings.LogLevel,0,5);
-        SetToggle("OptiFGDebugToggle", _currentSettings.OptiFGDebugView);
-        SetToggle("OptiFGAsyncToggle", _currentSettings.OptiFGAllowAsync);
-        SetToggle("OptiFGHudFixToggle", _currentSettings.OptiFGHUDFix);
-        SetToggle("DlssEnabledToggle", _currentSettings.DLSSEnabled);
-        SetToggle("DlssPresetOverrideToggle", _currentSettings.DLSSRenderPresetOverride);
-        SetText("FsrNearTextBox", _currentSettings.FSRCameraNear);
-        SetText("FsrFarTextBox", _currentSettings.FSRCameraFar);
-        SetToggle("FsrDebugToggle", _currentSettings.FSRDebugView);
-        SetToggle("XessBuildPipelinesToggle", _currentSettings.XeSSBuildPipelines);
+        setToggle("OptiFGDebugToggle", _currentSettings.OptiFGDebugView);
+        setToggle("OptiFGAsyncToggle", _currentSettings.OptiFGAllowAsync);
+        setToggle("OptiFGHudFixToggle", _currentSettings.OptiFGHUDFix);
+        setToggle("DlssEnabledToggle", _currentSettings.DLSSEnabled);
+        setToggle("DlssPresetOverrideToggle", _currentSettings.DLSSRenderPresetOverride);
+        setText("FsrNearTextBox", _currentSettings.FSRCameraNear);
+        setText("FsrFarTextBox", _currentSettings.FSRCameraFar);
+        setToggle("FsrDebugToggle", _currentSettings.FSRDebugView);
+        setToggle("XessBuildPipelinesToggle", _currentSettings.XeSSBuildPipelines);
         var xessModel = GetCtrl<ComboBox>("XessModelComboBox"); if (xessModel != null) xessModel.SelectedIndex = _currentSettings.XeSSNetworkModel;
-        SetToggle("QualityOverrideToggle", _currentSettings.QualityRatioOverrideEnabled);
-        SetText("RatioDLAABox", _currentSettings.QualityRatioDLAA);
-        SetText("RatioUltraQBox", _currentSettings.QualityRatioUltraQuality);
-        SetText("RatioQualityBox", _currentSettings.QualityRatioQuality);
-        SetText("RatioBalancedBox", _currentSettings.QualityRatioBalanced);
-        SetText("RatioPerformanceBox", _currentSettings.QualityRatioPerformance);
-        SetText("RatioUltraPerfBox", _currentSettings.QualityRatioUltraPerformance);
-        SetToggle("CasEnabledToggle", _currentSettings.CASEnabled);
-        SetToggle("CasMotionToggle", _currentSettings.CASMotionSharpnessEnabled);
-        SetText("CasMotionValueTextBox", _currentSettings.CASMotionSharpness);
-        SetToggle("LogToFileToggle", _currentSettings.LogToFile);
-        SetToggle("LogToConsoleToggle", _currentSettings.LogToConsole);
+        setToggle("QualityOverrideToggle", _currentSettings.QualityRatioOverrideEnabled);
+        setText("RatioDLAABox", _currentSettings.QualityRatioDLAA);
+        setText("RatioUltraQBox", _currentSettings.QualityRatioUltraQuality);
+        setText("RatioQualityBox", _currentSettings.QualityRatioQuality);
+        setText("RatioBalancedBox", _currentSettings.QualityRatioBalanced);
+        setText("RatioPerformanceBox", _currentSettings.QualityRatioPerformance);
+        setText("RatioUltraPerfBox", _currentSettings.QualityRatioUltraPerformance);
+        setToggle("CasEnabledToggle", _currentSettings.CASEnabled);
+        setToggle("CasMotionToggle", _currentSettings.CASMotionSharpnessEnabled);
+        setText("CasMotionValueTextBox", _currentSettings.CASMotionSharpness);
+        setToggle("LogToFileToggle", _currentSettings.LogToFile);
+        setToggle("LogToConsoleToggle", _currentSettings.LogToConsole);
     }
     
     private void UpdateSettingsFromUI()
@@ -677,6 +692,10 @@ public sealed partial class ModConfigPage : Page
         var tb = GetCtrl<TextBox>(name);
         if (tb != null) tb.Text = value.ToString("F2");
     }
+
+    // Helper methods for dynamic controls (lowercase for backward compat)
+    private void setToggle(string name, bool value) => SetToggle(name, value);
+    private void setText(string name, float value) => SetText(name, value);
 
     private void ParseRatio(string name, Action<float> setter)
     {

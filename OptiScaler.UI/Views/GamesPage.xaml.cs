@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Controls;
 using OptiScaler.UI.ViewModels;
 using OptiScaler.Core.Models;
 using OptiScaler.UI.Dialogs;
+using OptiScaler.UI.Services;
 
 namespace OptiScaler.UI.Views;
 
@@ -19,6 +20,21 @@ public sealed partial class GamesPage : Page
         ViewModel = new GamesViewModel();
         this.DataContext = ViewModel;
         System.Diagnostics.Debug.WriteLine("[GamesPage] Page initialized successfully");
+        
+        // Setup navigation (gamepad, keyboard, click-to-focus)
+        this.Loaded += OnPageLoaded;
+    }
+
+    private void OnPageLoaded(object sender, RoutedEventArgs e)
+    {
+        // Setup complete navigation support
+        InputNavigationService.SetupPageNavigation(
+            this,
+            onRefresh: async () => await ViewModel.ScanGamesCommand.ExecuteAsync(null),
+            onSettings: null
+        );
+        
+        System.Diagnostics.Debug.WriteLine("[GamesPage] Navigation setup complete - gamepad, keyboard, and click-to-focus enabled");
     }
 
     private async void ScanGames_Click(object sender, RoutedEventArgs e)

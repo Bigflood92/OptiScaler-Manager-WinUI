@@ -2,6 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using OptiScaler.Core.Services;
 using OptiScaler.Core;
+using OptiScaler.UI.Services;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -23,6 +24,18 @@ public sealed partial class AppSettingsPage : Page
         _customPaths = new ObservableCollection<string>();
         this.Loaded += AppSettingsPage_Loaded;
         InitializeUI();
+        
+        // Setup navigation after UI init
+        this.Loaded += OnPageLoaded;
+    }
+
+    private void OnPageLoaded(object sender, RoutedEventArgs e)
+    {
+        // Only run once
+        this.Loaded -= OnPageLoaded;
+        
+        // Setup complete navigation support
+        InputNavigationService.SetupPageNavigation(this, onRefresh: null, onSettings: null);
     }
 
     private void InitializeUI()

@@ -2,6 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using OptiScaler.UI.ViewModels;
 using OptiScaler.Core.Models;
+using OptiScaler.UI.Services;
 
 namespace OptiScaler.UI.Views;
 
@@ -13,6 +14,19 @@ public sealed partial class ModsPage : Page
     {
         this.InitializeComponent();
         ViewModel = new ModsViewModel();
+        
+        // Setup navigation
+        this.Loaded += OnPageLoaded;
+    }
+
+    private void OnPageLoaded(object sender, RoutedEventArgs e)
+    {
+        // Setup complete navigation support
+        InputNavigationService.SetupPageNavigation(
+            this,
+            onRefresh: async () => await ViewModel.CheckForUpdatesCommand.ExecuteAsync(null),
+            onSettings: null
+        );
     }
 
     private async void CheckForUpdates_Click(object sender, RoutedEventArgs e)
