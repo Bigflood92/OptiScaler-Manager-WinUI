@@ -88,9 +88,9 @@ if (Test-Path $PublishPath) {
     Write-Host "   ?? Copying published files..." -ForegroundColor Gray
     Copy-Item -Path "$PublishPath\*" -Destination $PackageFilesPath -Recurse -Force
     
-    # Copy manifest
+    # Copy manifest and rename to AppxManifest.xml
     Write-Host "   ?? Copying manifest..." -ForegroundColor Gray
-    Copy-Item -Path "OptiScaler.UI\Package.appxmanifest" -Destination $PackageFilesPath -Force
+    Copy-Item -Path "OptiScaler.UI\Package.appxmanifest" -Destination (Join-Path $PackageFilesPath "AppxManifest.xml") -Force
     
     # Copy assets
     Write-Host "   ?? Copying assets..." -ForegroundColor Gray
