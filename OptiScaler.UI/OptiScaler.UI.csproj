@@ -8,11 +8,15 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <UseWinUI>true</UseWinUI>
     <EnableMsixTooling>true</EnableMsixTooling>
-    <WindowsPackageType>None</WindowsPackageType>
+    <WindowsPackageType>MSIX</WindowsPackageType>
     <Nullable>enable</Nullable>
     <PublishTrimmed>false</PublishTrimmed>
     <Platforms>x64</Platforms>
     <PlatformTarget>x64</PlatformTarget>
+    
+    <!-- Package Identity -->
+    <ApplicationDisplayVersion>0.1.0</ApplicationDisplayVersion>
+    <ApplicationVersion>1</ApplicationVersion>
   </PropertyGroup>
 
   <!-- Debug: framework-dependent, explicit RID to avoid runtime mismatch prompts -->
