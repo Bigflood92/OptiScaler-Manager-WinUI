@@ -1,13 +1,21 @@
 # .gitignore for OptiScaler Manager WinUI 3
 
-# Visual Studio
+################################################################################
+# Visual Studio / IDEs
+################################################################################
 .vs/
+.vscode/
+.idea/
 *.user
 *.suo
 *.userosscache
 *.sln.docstates
+*.rsuser
+*.userprefs
 
-# Build results
+################################################################################
+# Build Outputs
+################################################################################
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
@@ -22,12 +30,12 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
-# .NET
+################################################################################
+# .NET / NuGet
+################################################################################
 project.lock.json
 project.fragment.lock.json
 artifacts/
-
-# NuGet
 *.nupkg
 *.snupkg
 **/packages/*
@@ -35,7 +43,43 @@ artifacts/
 *.nuget.props
 *.nuget.targets
 
-# Files built by Visual Studio
+################################################################################
+# MSIX / Windows Store Packages
+################################################################################
+AppPackages/
+BundleArtifacts/
+Package.StoreAssociation.xml
+_pkginfo.txt
+*.appx
+*.appxbundle
+*.appxupload
+*.msix
+*.msixbundle
+*.msixupload
+
+################################################################################
+# CRITICAL - SENSITIVE FILES (NEVER COMMIT)
+################################################################################
+# Certificates - NUNCA subir certificados privados
+*.pfx
+*.p12
+*.key
+*.cer
+*.crt
+
+# Secrets - NUNCA subir API keys o secrets
+secrets.json
+appsettings.Development.json
+.env
+.env.local
+*.secret
+
+# Personal settings
+launchSettings.json
+
+################################################################################
+# Compiled Files
+################################################################################
 *_i.c
 *_p.c
 *_h.h
@@ -64,65 +108,101 @@ artifacts/
 *.svclog
 *.scc
 
-# Windows Store
-AppPackages/
-BundleArtifacts/
-Package.StoreAssociation.xml
-_pkginfo.txt
-*.appx
-*.appxbundle
-*.appxupload
-*.msix
-*.msixbundle
-*.msixupload
-
-# Visual Studio cache
+################################################################################
+# Cache Files
+################################################################################
 *.[Cc]ache
 !?*.[Cc]ache/
+*.DotSettings.user
 
-# VS Code
-.vscode/
-
-# Rider
-.idea/
-
-# Windows
+################################################################################
+# Windows / macOS
+################################################################################
 Thumbs.db
 ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
+.DS_Store
+._*
 
-# Backup files
+################################################################################
+# Backup Files
+################################################################################
 *.backup
 *.bak
 *~
 *.old
+*.orig
 
-# Temporary test files
+################################################################################
+# Test Files
+################################################################################
 Test*.ps1
 Test*.cs
 
-# Old project folders
+################################################################################
+# Project-Specific Cleanup
+################################################################################
+# Old folders
 antiguo proyecto/
-
-# Asset backups
 **/Assets/Backup_*/
-
-# Source logos folder (already copied to Assets)
 Logos/
 
-# Local compiled exe
-*.exe
-!**/bin/Release/**/*.exe
-
-# Fody
-FodyWeavers.xsd
-
-# Local History for Visual Studio
-.localhistory/
-
-# OptiScaler specific
-*.log
+# Temporary folders
 temp/
 cache/
 Config/
+
+# Package build outputs
+PackageOutput/
+PackageFiles/
+
+# Local executables (except final Release builds)
+*.exe
+!**/bin/Release/**/*.exe
+
+################################################################################
+# Fody
+################################################################################
+FodyWeavers.xsd
+
+################################################################################
+# Local History
+################################################################################
+.localhistory/
+
+################################################################################
+# OptiScaler Manager Specific
+################################################################################
+# Crash logs (solo local, no subir)
+CrashLogs/
+
+# Downloaded mods cache (solo local)
+Mods/
+
+# User settings (solo local)
+Settings/
+
+################################################################################
+# KEEP THESE (Whitelist)
+################################################################################
+# Documentation
+!README.md
+!LICENSE
+!CONTRIBUTING.md
+!CODE_OF_CONDUCT.md
+!*.md
+
+# Essential assets
+!Assets/**/*.png
+!Assets/**/*.jpg
+!Assets/**/*.ico
+
+# Screenshots
+!Screenshots/*.png
+
+# GitHub Pages
+!docs/**/*
+
+# Useful scripts
+!*.ps1
