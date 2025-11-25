@@ -19,8 +19,8 @@
     <PublisherDisplayName>Bigflood92</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
     <Description>Modern Windows app for game optimization with FSR3 and DLSS mods. Manage upscaling, frame generation, and graphics settings for your games.</Description>
-    <uap:SupportUrl>https://github.com/Bigflood92/OptiScaler-Manager</uap:SupportUrl>
-    <PrivacyPolicy>https://bigflood92.github.io/OptiScaler-Manager/PrivacyPolicy.html</PrivacyPolicy>
+    <uap:SupportUrl>https://github.com/Bigflood92/OptiScaler-Manager-WinUI</uap:SupportUrl>
+    <PrivacyPolicy>https://bigflood92.github.io/OptiScaler-Manager-WinUI/PrivacyPolicy.html</PrivacyPolicy>
   </Properties>
 
   <Dependencies>
