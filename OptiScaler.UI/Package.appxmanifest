@@ -20,7 +20,7 @@
     <Logo>Assets\StoreLogo.png</Logo>
     <Description>Modern Windows app for game optimization with FSR3 and DLSS mods. Manage upscaling, frame generation, and graphics settings for your games.</Description>
     <uap:SupportUrl>https://github.com/Bigflood92/OptiScaler-Manager-WinUI</uap:SupportUrl>
-    <PrivacyPolicy>https://optiscaler-manager.netlify.app/PrivacyPolicy.html</PrivacyPolicy>
+    <PrivacyPolicy>https://bigflood92.github.io/OptiScaler-Manager-WinUI/PrivacyPolicy.html</PrivacyPolicy>
   </Properties>
 
   <Dependencies>
