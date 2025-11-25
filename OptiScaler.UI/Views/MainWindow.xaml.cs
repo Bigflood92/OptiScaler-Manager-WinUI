@@ -19,6 +19,9 @@ public sealed partial class MainWindow : Window
         this.InitializeComponent();
         Title = AppInfo.FullTitle;
         
+        // Set window icon
+        SetWindowIcon();
+        
         // Customize title bar
         CustomizeTitleBar();
         
@@ -30,6 +33,27 @@ public sealed partial class MainWindow : Window
         
         // Check for review prompt after a delay
         _ = CheckForReviewPromptAsync();
+    }
+
+    private void SetWindowIcon()
+    {
+        try
+        {
+            var hWnd = WindowNative.GetWindowHandle(this);
+            var windowId = Win32Interop.GetWindowIdFromWindow(hWnd);
+            var appWindow = AppWindow.GetFromWindowId(windowId);
+
+            if (appWindow != null)
+            {
+                // Set the icon from the app package
+                // The icon file should be in Assets/Square44x44Logo.png
+                appWindow.SetIcon("Assets/Square44x44Logo.png");
+            }
+        }
+        catch
+        {
+            // Silently fail if icon can't be set (e.g., in debug without packaged app)
+        }
     }
 
     private void CustomizeTitleBar()

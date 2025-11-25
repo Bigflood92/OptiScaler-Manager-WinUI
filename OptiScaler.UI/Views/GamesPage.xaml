@@ -64,11 +64,33 @@
             </Grid>
 
             <!-- Search Box -->
-            <TextBox 
-                PlaceholderText="Search games..."
-                Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                Height="40"
-                VerticalAlignment="Center"/>
+            <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBox 
+                    Grid.Column="0"
+                    PlaceholderText="Search games..."
+                    Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Height="40"
+                    VerticalAlignment="Center"/>
+
+                <!-- Filter Button (Visual only - shows search is available) -->
+                <Button 
+                    Grid.Column="1"
+                    Style="{StaticResource XboxButtonStyle}"
+                    Height="40"
+                    MinWidth="100"
+                    VerticalAlignment="Center"
+                    ToolTipService.ToolTip="Filter by platform (Steam, Epic, Xbox, etc.)">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE71C;" FontSize="16"/>
+                        <TextBlock Text="Filter"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
 
             <!-- Installation Progress InfoBar -->
             <InfoBar
