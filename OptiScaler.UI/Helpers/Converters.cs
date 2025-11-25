@@ -218,3 +218,39 @@ public class ModStatusToTextConverter : IValueConverter
         throw new NotImplementedException();
     }
 }
+
+/// <summary>
+/// Converts GamePlatform enum to platform icon image source
+/// </summary>
+public class PlatformIconConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
+    {
+        if (value is GamePlatform platform)
+        {
+            var iconName = platform switch
+            {
+                GamePlatform.Steam => "steam.png",
+                GamePlatform.Epic => "epic.png",
+                GamePlatform.Xbox => "xbox.png",
+                GamePlatform.GOG => "gog.png",
+                GamePlatform.EA => "ea.png",
+                GamePlatform.Ubisoft => "ubisoft.png",
+                GamePlatform.Manual => "manual.png",
+                _ => "manual.png"
+            };
+
+            var uri = new Uri($"ms-appx:///Assets/PlatformIcons/{iconName}");
+            return new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(uri);
+        }
+
+        // Fallback icon
+        return new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(
+            new Uri("ms-appx:///Assets/PlatformIcons/manual.png"));
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        throw new NotImplementedException();
+    }
+}

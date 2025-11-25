@@ -16,6 +16,7 @@
         <helpers:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
         <helpers:GamePlatformToStringConverter x:Key="GamePlatformToStringConverter"/>
         <helpers:GamePlatformToIconConverter x:Key="GamePlatformToIconConverter"/>
+        <helpers:PlatformIconConverter x:Key="PlatformIconConverter"/>
         <helpers:ModStatusToTextConverter x:Key="ModStatusToTextConverter"/>
         <helpers:CountToVisibilityConverter x:Key="CountToVisibilityConverter"/>
         <converters:BoolToBackgroundConverter x:Key="BoolToBackgroundConverter"/>
@@ -236,10 +237,11 @@
                                             Padding="10,6"
                                             HorizontalAlignment="Left">
                                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                                <FontIcon 
-                                                    Glyph="{x:Bind Platform, Converter={StaticResource GamePlatformToIconConverter}}"
-                                                    FontSize="14"
-                                                    Foreground="White"/>
+                                                <Image 
+                                                    Source="{x:Bind Platform, Converter={StaticResource PlatformIconConverter}}"
+                                                    Width="20"
+                                                    Height="20"
+                                                    Stretch="Uniform"/>
                                                 <TextBlock 
                                                     Text="{x:Bind Platform, Converter={StaticResource GamePlatformToStringConverter}}"
                                                     FontSize="12"
