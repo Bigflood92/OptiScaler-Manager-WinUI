@@ -85,6 +85,23 @@
                     MinWidth="100"
                     VerticalAlignment="Center"
                     ToolTipService.ToolTip="Filter by platform (Steam, Epic, Xbox, etc.)">
+                    <Button.Flyout>
+                        <Flyout Placement="BottomEdgeAlignedRight">
+                            <StackPanel Width="200" Spacing="8">
+                                <TextBlock 
+                                    Text="Filter by Platform"
+                                    FontSize="14"
+                                    FontWeight="Bold"
+                                    Foreground="White"
+                                    Margin="0,0,0,8"/>
+                                <TextBlock 
+                                    Text="Use the search box to filter games by name or platform (Steam, Epic, Xbox, GOG, EA, Ubisoft)"
+                                    FontSize="12"
+                                    Foreground="#CCCCCC"
+                                    TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Flyout>
+                    </Button.Flyout>
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon Glyph="&#xE71C;" FontSize="16"/>
                         <TextBlock Text="Filter"/>

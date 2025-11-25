@@ -45,14 +45,32 @@ public sealed partial class MainWindow : Window
 
             if (appWindow != null)
             {
-                // Set the icon from the app package
-                // The icon file should be in Assets/Square44x44Logo.png
-                appWindow.SetIcon("Assets/Square44x44Logo.png");
+                // Try to set icon - works for packaged apps
+                try
+                {
+                    appWindow.SetIcon("Assets/Square44x44Logo.png");
+                }
+                catch
+                {
+                    // For unpackaged apps (debug), use Win32 API
+                    try
+                    {
+                        var iconPath = System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "Square44x44Logo.png");
+                        if (System.IO.File.Exists(iconPath))
+                        {
+                            appWindow.SetIcon(iconPath);
+                        }
+                    }
+                    catch
+                    {
+                        // Icon setting failed - not critical, continue
+                    }
+                }
             }
         }
         catch
         {
-            // Silently fail if icon can't be set (e.g., in debug without packaged app)
+            // Silently fail if icon can't be set
         }
     }
 
