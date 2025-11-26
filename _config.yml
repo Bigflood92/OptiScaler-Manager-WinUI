@@ -1,0 +1,59 @@
+# GitHub Pages Configuration
+theme: jekyll-theme-cayman
+title: OptiScaler Manager Documentation
+description: Modern Windows application for managing DLSS, FSR, and XeSS upscaling mods
+show_downloads: false
+github:
+  is_project_page: true
+  repository_name: OptiScaler-Manager-WinUI
+  repository_url: https://github.com/Bigflood92/OptiScaler-Manager-WinUI
+
+# Build settings
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+# Include/Exclude files
+include:
+  - docs
+  - README.md
+  - LICENSE
+
+exclude:
+  - .github
+  - .gitignore
+  - .git
+  - OptiScaler.Core
+  - OptiScaler.UI
+  - "*.csproj"
+  - "*.sln"
+  - "*.cs"
+  - bin
+  - obj
+
+# Plugins
+plugins:
+  - jekyll-relative-links
+  - jekyll-optional-front-matter
+  - jekyll-readme-index
+  - jekyll-default-layout
+  - jekyll-titles-from-headings
+
+relative_links:
+  enabled: true
+  collections: true
+
+optional_front_matter:
+  remove_originals: true
+
+readme_index:
+  enabled: true
+
+default_layout:
+  enabled: true
+
+titles_from_headings:
+  enabled: true
+  strip_title: true
+  collections: true
