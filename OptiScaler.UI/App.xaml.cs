@@ -1,12 +1,12 @@
 using System;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using Microsoft.UI.Xaml;
 using OptiScaler.UI.Views;
 using OptiScaler.Core.Services;
 using OptiScaler.UI.Dialogs;
 using OptiScaler.UI.Services;
-using Microsoft.Windows.AppLifecycle;
 using System.Diagnostics;
 
 #nullable enable
@@ -21,6 +21,7 @@ public partial class App : Application
     private Window? _mainWindow;
     private readonly CrashReportService _crashReportService;
     private readonly ReviewPromptService _reviewPromptService;
+    private static Mutex? _instanceMutex;
 
     // Win32 imports for window management
     [DllImport("user32.dll")]
@@ -62,61 +63,32 @@ public partial class App : Application
     {
         Debug.WriteLine("[App] OnLaunched called");
 
+        // Single instance check using Mutex
+        const string mutexName = "OptiScalerManager_SingleInstance_Mutex";
+        bool createdNew = false;
+        
         try
         {
-            // Check for existing instances and redirect if found
-            var currentInstance = AppInstance.GetCurrent();
-            var activationArgs = currentInstance.GetActivatedEventArgs();
+            _instanceMutex = new Mutex(true, mutexName, out createdNew);
             
-            var instances = AppInstance.GetInstances();
-            
-            // Find any other instance that is not the current one
-            var otherInstance = instances.FirstOrDefault(i => !i.IsCurrent);
-            if (otherInstance != null)
+            if (!createdNew)
             {
-                Debug.WriteLine("[App] Found existing instance, redirecting and exiting");
-                // Redirect to existing instance and terminate this one
-                try
-                {
-                    otherInstance.RedirectActivationToAsync(activationArgs).AsTask().Wait();
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"[App] Redirect failed: {ex.Message}");
-                }
+                Debug.WriteLine("[App] Another instance is already running, exiting");
+                // Another instance is already running
                 Environment.Exit(0);
                 return;
             }
-
-            // Register activation handler for future activations
-            currentInstance.Activated += (_, activationArgs) =>
-            {
-                Debug.WriteLine("[App] Activated event received (bringing existing window to front)");
-                _mainWindow?.DispatcherQueue.TryEnqueue(() =>
-                {
-                    try
-                    {
-                        // Bring existing window to foreground
-                        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(_mainWindow);
-                        ShowWindow(hwnd, SW_RESTORE);
-                        SetForegroundWindow(hwnd);
-                        Debug.WriteLine("[App] Brought window to foreground");
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine($"[App] Error bringing window to foreground: {ex.Message}");
-                    }
-                });
-            };
+            
+            Debug.WriteLine("[App] This is the primary instance (Mutex acquired)");
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[App] Single instance check failed: {ex.Message}");
-            // Continue with normal startup if single instance check fails
+            Debug.WriteLine($"[App] Mutex check failed: {ex.Message}, continuing anyway");
+            // If mutex fails, continue with startup
         }
 
         // This is the first/only instance - create main window
-        Debug.WriteLine("[App] This is the primary instance, creating main window");
+        Debug.WriteLine("[App] Creating main window");
         _reviewPromptService.RecordAppLaunch();
         
         _mainWindow = new MainWindow();
