@@ -7,8 +7,11 @@
     <RootNamespace>OptiScaler.UI</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <UseWinUI>true</UseWinUI>
-    <EnableMsixTooling>true</EnableMsixTooling>
-    <WindowsPackageType>MSIX</WindowsPackageType>
+    
+    <!-- TEMPORARILY DISABLE MSIX FOR DEBUGGING -->
+    <EnableMsixTooling>false</EnableMsixTooling>
+    <WindowsPackageType>None</WindowsPackageType>
+    
     <Nullable>enable</Nullable>
     <PublishTrimmed>false</PublishTrimmed>
     <Platforms>x64</Platforms>
