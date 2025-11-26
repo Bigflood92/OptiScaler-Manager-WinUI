@@ -62,20 +62,57 @@ public partial class App : Application
     {
         Debug.WriteLine("[App] OnLaunched called");
 
-        // Check for existing instances and redirect if found
-        var currentInstance = AppInstance.GetCurrent();
-        var instances = AppInstance.GetInstances();
-        
-        // Find any other instance that is not the current one
-        var otherInstance = instances.FirstOrDefault(i => !i.IsCurrent);
-        if (otherInstance != null)
+        try
         {
-            Debug.WriteLine("[App] Found existing instance, redirecting and exiting");
-            // Redirect to existing instance and terminate this one
+            // Check for existing instances and redirect if found
+            var currentInstance = AppInstance.GetCurrent();
             var activationArgs = currentInstance.GetActivatedEventArgs();
-            otherInstance.RedirectActivationToAsync(activationArgs).AsTask().Wait();
-            Environment.Exit(0);
-            return;
+            
+            var instances = AppInstance.GetInstances();
+            
+            // Find any other instance that is not the current one
+            var otherInstance = instances.FirstOrDefault(i => !i.IsCurrent);
+            if (otherInstance != null)
+            {
+                Debug.WriteLine("[App] Found existing instance, redirecting and exiting");
+                // Redirect to existing instance and terminate this one
+                try
+                {
+                    otherInstance.RedirectActivationToAsync(activationArgs).AsTask().Wait();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[App] Redirect failed: {ex.Message}");
+                }
+                Environment.Exit(0);
+                return;
+            }
+
+            // Register activation handler for future activations
+            currentInstance.Activated += (_, activationArgs) =>
+            {
+                Debug.WriteLine("[App] Activated event received (bringing existing window to front)");
+                _mainWindow?.DispatcherQueue.TryEnqueue(() =>
+                {
+                    try
+                    {
+                        // Bring existing window to foreground
+                        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(_mainWindow);
+                        ShowWindow(hwnd, SW_RESTORE);
+                        SetForegroundWindow(hwnd);
+                        Debug.WriteLine("[App] Brought window to foreground");
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"[App] Error bringing window to foreground: {ex.Message}");
+                    }
+                });
+            };
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[App] Single instance check failed: {ex.Message}");
+            // Continue with normal startup if single instance check fails
         }
 
         // This is the first/only instance - create main window
@@ -86,27 +123,6 @@ public partial class App : Application
         _mainWindow.Activate();
         
         Debug.WriteLine("[App] Main window created and activated");
-
-        // Register activation handler for future activations
-        currentInstance.Activated += (_, activationArgs) =>
-        {
-            Debug.WriteLine("[App] Activated event received (bringing existing window to front)");
-            _mainWindow?.DispatcherQueue.TryEnqueue(() =>
-            {
-                try
-                {
-                    // Bring existing window to foreground
-                    var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(_mainWindow);
-                    ShowWindow(hwnd, SW_RESTORE);
-                    SetForegroundWindow(hwnd);
-                    Debug.WriteLine("[App] Brought window to foreground");
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"[App] Error bringing window to foreground: {ex.Message}");
-                }
-            });
-        };
     }
 
     private async void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
