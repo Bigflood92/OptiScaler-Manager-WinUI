@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Runtime.ExceptionServices;
 using Microsoft.UI.Xaml;
 using OptiScaler.UI.Views;
 using OptiScaler.Core.Services;
@@ -47,12 +48,38 @@ public partial class App : Application
     /// </summary>
     public App()
     {
-        this.InitializeComponent();
+        Debug.WriteLine("[App] Constructor started");
+        
+        try
+        {
+            // Register first-chance exception handler
+            AppDomain.CurrentDomain.FirstChanceException += (sender, e) =>
+            {
+                if (e.Exception is COMException comEx)
+                {
+                    Debug.WriteLine($"[App] First-chance COM exception: {comEx.Message}");
+                    Debug.WriteLine($"[App] HRESULT: 0x{comEx.HResult:X8}");
+                    Debug.WriteLine($"[App] Stack trace: {comEx.StackTrace}");
+                }
+            };
 
-        _crashReportService = new CrashReportService();
-        _reviewPromptService = new ReviewPromptService();
+            this.InitializeComponent();
+            Debug.WriteLine("[App] InitializeComponent completed");
 
-        this.UnhandledException += App_UnhandledException;
+            _crashReportService = new CrashReportService();
+            _reviewPromptService = new ReviewPromptService();
+
+            this.UnhandledException += App_UnhandledException;
+            
+            Debug.WriteLine("[App] Constructor completed successfully");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[App] Constructor exception: {ex.GetType().Name}");
+            Debug.WriteLine($"[App] Message: {ex.Message}");
+            Debug.WriteLine($"[App] Stack: {ex.StackTrace}");
+            throw;
+        }
     }
 
     /// <summary>
@@ -63,43 +90,57 @@ public partial class App : Application
     {
         Debug.WriteLine("[App] OnLaunched called");
 
-        // Single instance check using Mutex
-        const string mutexName = "OptiScalerManager_SingleInstance_Mutex";
-        bool createdNew = false;
-        
         try
         {
-            _instanceMutex = new Mutex(true, mutexName, out createdNew);
+            // Single instance check using Mutex
+            const string mutexName = "OptiScalerManager_SingleInstance_Mutex";
+            bool createdNew = false;
             
-            if (!createdNew)
+            try
             {
-                Debug.WriteLine("[App] Another instance is already running, exiting");
-                // Another instance is already running
-                Environment.Exit(0);
-                return;
+                _instanceMutex = new Mutex(true, mutexName, out createdNew);
+                
+                if (!createdNew)
+                {
+                    Debug.WriteLine("[App] Another instance is already running, exiting");
+                    // Another instance is already running
+                    Environment.Exit(0);
+                    return;
+                }
+                
+                Debug.WriteLine("[App] This is the primary instance (Mutex acquired)");
             }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[App] Mutex check failed: {ex.Message}, continuing anyway");
+                // If mutex fails, continue with startup
+            }
+
+            // This is the first/only instance - create main window
+            Debug.WriteLine("[App] Creating main window");
+            _reviewPromptService.RecordAppLaunch();
             
-            Debug.WriteLine("[App] This is the primary instance (Mutex acquired)");
+            _mainWindow = new MainWindow();
+            Debug.WriteLine("[App] MainWindow instantiated");
+            
+            _mainWindow.Activate();
+            Debug.WriteLine("[App] Main window activated successfully");
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[App] Mutex check failed: {ex.Message}, continuing anyway");
-            // If mutex fails, continue with startup
+            Debug.WriteLine($"[App] OnLaunched exception: {ex.GetType().Name}");
+            Debug.WriteLine($"[App] Message: {ex.Message}");
+            Debug.WriteLine($"[App] Stack: {ex.StackTrace}");
+            throw;
         }
-
-        // This is the first/only instance - create main window
-        Debug.WriteLine("[App] Creating main window");
-        _reviewPromptService.RecordAppLaunch();
-        
-        _mainWindow = new MainWindow();
-        _mainWindow.Activate();
-        
-        Debug.WriteLine("[App] Main window created and activated");
     }
 
     private async void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
         e.Handled = true;
+        
+        Debug.WriteLine($"[App] Unhandled exception: {e.Exception.GetType().Name}");
+        Debug.WriteLine($"[App] Message: {e.Exception.Message}");
 
         var crashLogPath = await _crashReportService.LogCrashAsync(
             e.Exception,
