@@ -145,6 +145,19 @@ public partial class GamesViewModel : ObservableObject
             StatusMessage = "Scanning for games...";
             ScanProgress = 0;
 
+            // Ensure we read latest global settings saved by UI
+            var globalSettings = await new GlobalSettingsService().LoadSettingsAsync(forceReload: true);
+            Debug.WriteLine($"[GamesVM] Global scan settings: Steam={globalSettings.ScanSteam}, Epic={globalSettings.ScanEpic}, Xbox={globalSettings.ScanXbox}, GOG={globalSettings.ScanGOG}, EA={globalSettings.ScanEA}, Ubisoft={globalSettings.ScanUbisoft}, CustomPaths={globalSettings.CustomGamePaths.Count}");
+
+            // If no platforms enabled and no custom paths, skip scanning
+            if (!globalSettings.ScanSteam && !globalSettings.ScanEpic && !globalSettings.ScanXbox && 
+                !globalSettings.ScanGOG && !globalSettings.ScanEA && !globalSettings.ScanUbisoft && 
+                (globalSettings.CustomGamePaths == null || !globalSettings.CustomGamePaths.Any()))
+            {
+                StatusMessage = "No platforms enabled in Settings. Enable platforms or add custom paths before scanning.";
+                return;
+            }
+
             var games = await _scanner.ScanAllPlatformsAsync();
             
             // Use a HashSet to avoid duplicates based on executable path

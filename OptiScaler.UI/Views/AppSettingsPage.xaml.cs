@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace OptiScaler.UI.Views;
 
@@ -16,6 +17,7 @@ public sealed partial class AppSettingsPage : Page
     private readonly GlobalSettingsService _settingsService;
     private readonly ObservableCollection<string> _customPaths;
     private bool _initialized;
+    private readonly SemaphoreSlim _saveLock = new(1, 1);
 
     public AppSettingsPage()
     {
@@ -220,9 +222,10 @@ public sealed partial class AppSettingsPage : Page
 
     private async Task SaveSettingsAutomatically()
     {
+        await _saveLock.WaitAsync();
         try
         {
-            var settings = await _settingsService.LoadSettingsAsync();
+            var settings = await _settingsService.LoadSettingsAsync(forceReload: true);
             settings.ScanSteam = SteamToggle.IsOn;
             settings.ScanEpic = EpicToggle.IsOn;
             settings.ScanXbox = XboxToggle.IsOn;
@@ -239,6 +242,8 @@ public sealed partial class AppSettingsPage : Page
             settings.LastUpdated = DateTime.Now;
 
             await _settingsService.SaveSettingsAsync(settings);
+            Debug.WriteLine($"[AppSettings] Settings saved (ScanSteam={settings.ScanSteam}, ScanEpic={settings.ScanEpic}, ScanXbox={settings.ScanXbox})");
+
             var original = StatusMessage.Text;
             StatusMessage.Text = "Settings auto-saved";
             StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.LightGreen);
@@ -253,6 +258,10 @@ public sealed partial class AppSettingsPage : Page
         {
             StatusMessage.Text = $"Auto-save failed: {ex.Message}";
             StatusMessage.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Orange);
+        }
+        finally
+        {
+            _saveLock.Release();
         }
     }
 
