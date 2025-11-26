@@ -22,9 +22,9 @@ public class GlobalSettingsService
     /// <summary>
     /// Load global settings
     /// </summary>
-    public async Task<GlobalSettings> LoadSettingsAsync()
+    public async Task<GlobalSettings> LoadSettingsAsync(bool forceReload = false)
     {
-        if (_cachedSettings != null)
+        if (!forceReload && _cachedSettings != null)
             return _cachedSettings;
 
         try
@@ -81,6 +81,8 @@ public class GlobalSettingsService
             
             await File.WriteAllTextAsync(_settingsPath, json);
             _cachedSettings = settings;
+
+            System.Diagnostics.Debug.WriteLine($"[GlobalSettings] Saved settings to {_settingsPath} ({json.Length} bytes)");
         }
         catch (Exception ex)
         {

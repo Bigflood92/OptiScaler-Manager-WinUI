@@ -25,8 +25,8 @@ public class GameScannerService : IGameScannerService
     {
         var allGames = new List<GameInfo>();
         
-        // Load settings to check which platforms are enabled
-        var globalSettings = await new GlobalSettingsService().LoadSettingsAsync();
+        // Load settings to check which platforms are enabled (force reload to respect recent changes)
+        var globalSettings = await new GlobalSettingsService().LoadSettingsAsync(forceReload: true);
         
         // Build list of enabled platforms
         var enabledPlatforms = new List<GamePlatform>();
@@ -285,11 +285,13 @@ public class GameScannerService : IGameScannerService
 
         try
         {
-            // Xbox Game Pass games location - C:\XboxGames
+            // Xbox Game Pass games location - C:\XboxGames (primary location for Game Pass games)
             var xboxGamesPath = @"C:\XboxGames";
 
             if (Directory.Exists(xboxGamesPath))
             {
+                Debug.WriteLine($"[GameScanner] Scanning Xbox Game Pass directory: {xboxGamesPath}");
+                
                 await Task.Run(() =>
                 {
                     foreach (var gameFolder in Directory.GetDirectories(xboxGamesPath))
@@ -300,7 +302,10 @@ public class GameScannerService : IGameScannerService
                         // Skip non-game folders
                         var folderName = Path.GetFileName(gameFolder);
                         if (folderName.Equals("GameSave", StringComparison.OrdinalIgnoreCase))
+                        {
+                            Debug.WriteLine($"[GameScanner] Skipping GameSave folder");
                             continue;
+                        }
 
                         // Xbox games typically have a Content subfolder
                         var contentFolder = Path.Combine(gameFolder, "Content");
@@ -328,58 +333,27 @@ public class GameScannerService : IGameScannerService
                             games.Add(game);
                             GameDiscovered?.Invoke(this, game);
                         }
-                    }
-                }, cancellationToken);
-            }
-
-            // Also check WindowsApps folder (Microsoft Store apps)
-            var windowsAppsPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
-                "WindowsApps");
-
-            if (Directory.Exists(windowsAppsPath))
-            {
-                await Task.Run(() =>
-                {
-                    try
-                    {
-                        foreach (var gameFolder in Directory.GetDirectories(windowsAppsPath))
+                        else
                         {
-                            if (cancellationToken.IsCancellationRequested)
-                                break;
-
-                            var folderName = Path.GetFileName(gameFolder);
-                            if (folderName.StartsWith("Microsoft.") || folderName.StartsWith("Windows."))
-                                continue;
-
-                            var executablePath = FindGameExecutableInPath(gameFolder);
-                            if (!string.IsNullOrEmpty(executablePath))
-                            {
-                                var game = new GameInfo
-                                {
-                                    Name = folderName.Split('_')[0],
-                                    Path = gameFolder,
-                                    Executable = executablePath,
-                                    InstallDirectory = Path.GetDirectoryName(executablePath) ?? gameFolder,
-                                    Platform = GamePlatform.Xbox
-                                };
-
-                                RefreshModStatusAsync(game).Wait();
-                                games.Add(game);
-                                GameDiscovered?.Invoke(this, game);
-                            }
+                            Debug.WriteLine($"[GameScanner] No valid executable found in {folderName}");
                         }
                     }
-                    catch (UnauthorizedAccessException)
-                    {
-                        Debug.WriteLine("Xbox: Insufficient permissions for WindowsApps folder");
-                    }
                 }, cancellationToken);
+                
+                Debug.WriteLine($"[GameScanner] Xbox scan complete: {games.Count} games found in {xboxGamesPath}");
             }
+            else
+            {
+                Debug.WriteLine($"[GameScanner] Xbox Game Pass directory not found: {xboxGamesPath}");
+            }
+
+            // NOTE: WindowsApps scanning removed - it's too broad, slow, and has permission issues
+            // Xbox Game Pass games are already in C:\XboxGames
+            // If you need to scan WindowsApps, enable Deep Scan and add custom path: C:\Program Files\WindowsApps
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Xbox scan error: {ex.Message}");
+            Debug.WriteLine($"[GameScanner] Xbox scan error: {ex.Message}");
         }
 
         return games;
