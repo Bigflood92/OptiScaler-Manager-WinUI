@@ -1,208 +1,89 @@
-# .gitignore for OptiScaler Manager WinUI 3
+# .gitignore for PUBLIC repository (GitHub Pages only)
+# Este archivo debe excluir TODO el código del proyecto WinUI
 
 ################################################################################
-# Visual Studio / IDEs
+# EXCLUIR TODO EL CÓDIGO DEL PROYECTO
 ################################################################################
+
+# Proyectos .NET
+OptiScaler.UI/
+OptiScaler.Core/
+*.csproj
+*.sln
+global.json
+
+# Código fuente
+*.cs
+*.xaml
+*.xaml.cs
+
+# Scripts de desarrollo (mantener solo los de documentación)
+*.ps1
+!Update-GitHubPages.ps1
+
+# Archivos de configuración del proyecto
+Directory.Build.props
+Directory.Packages.props
+nuget.config
+
+# Archivos de construcción y binarios
+bin/
+obj/
 .vs/
 .vscode/
-.idea/
 *.user
 *.suo
-*.userosscache
-*.sln.docstates
-*.rsuser
-*.userprefs
 
-################################################################################
-# Build Outputs
-################################################################################
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
-x64/
-x86/
-[Aa][Rr][Mm]/
-[Aa][Rr][Mm]64/
-bld/
-[Bb]in/
-[Oo]bj/
-[Ll]og/
-[Ll]ogs/
+# Documentos internos del proyecto
+CHANGELOG.md
+EPIC_SESSION_FINAL_SUMMARY.md
+FINAL_SESSION_SUMMARY.md
+MSIX_PACKAGING_GUIDE.md
+PARTNER_CENTER_UPDATED_GUIDE.md
+PARTNER_CENTER_CHECKLIST.md
+PHASE_PLAN_UPDATED.md
+STORE_DESCRIPTION.md
+STORE_SUBMISSION_CHECKLIST.md
+STORE_SUBMISSION_GUIDE.md
+UpgradeLog.htm
+TestGitHub.cs
 
-################################################################################
-# .NET / NuGet
-################################################################################
-project.lock.json
-project.fragment.lock.json
-artifacts/
-*.nupkg
-*.snupkg
-**/packages/*
-!**/packages/build/
-*.nuget.props
-*.nuget.targets
-
-################################################################################
-# MSIX / Windows Store Packages
-################################################################################
-AppPackages/
-BundleArtifacts/
-Package.StoreAssociation.xml
-_pkginfo.txt
-*.appx
-*.appxbundle
-*.appxupload
-*.msix
-*.msixbundle
-*.msixupload
-
-################################################################################
-# CRITICAL - SENSITIVE FILES (NEVER COMMIT)
-################################################################################
-# Certificates - NUNCA subir certificados privados
+# Certificados y archivos sensibles
 *.pfx
 *.p12
-*.key
-*.cer
-*.crt
-
-# Secrets - NUNCA subir API keys o secrets
 secrets.json
-appsettings.Development.json
-.env
-.env.local
-*.secret
 
-# Personal settings
-launchSettings.json
-
-################################################################################
-# Compiled Files
-################################################################################
-*_i.c
-*_p.c
-*_h.h
-*.ilk
-*.meta
-*.obj
-*.iobj
-*.pch
-*.pdb
-*.ipdb
-*.pgc
-*.pgd
-*.rsp
-*.sbr
-*.tlb
-*.tli
-*.tlh
-*.tmp
-*.tmp_proj
-*_wpftmp.csproj
-*.log
-*.vspscc
-*.vssscc
-.builds
-*.pidb
-*.svclog
-*.scc
-
-################################################################################
-# Cache Files
-################################################################################
-*.[Cc]ache
-!?*.[Cc]ache/
-*.DotSettings.user
-
-################################################################################
-# Windows / macOS
-################################################################################
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
-.DS_Store
-._*
-
-################################################################################
-# Backup Files
-################################################################################
-*.backup
-*.bak
-*~
-*.old
-*.orig
-
-################################################################################
-# Test Files
-################################################################################
-Test*.ps1
-Test*.cs
-
-################################################################################
-# Project-Specific Cleanup
-################################################################################
-# Old folders
-antiguo proyecto/
-**/Assets/Backup_*/
-Logos/
-
-# Temporary folders
-temp/
-cache/
-Config/
-
-# Package build outputs
+# Paquetes y outputs
+*.msix
+*.appx
+AppPackages/
 PackageOutput/
-PackageFiles/
 
-# Local executables (except final Release builds)
-*.exe
-!**/bin/Release/**/*.exe
+# Assets del proyecto (no necesarios en docs)
+Assets/
+Screenshots/
 
-################################################################################
-# Fody
-################################################################################
-FodyWeavers.xsd
+# Archivos de terceros
+THIRD_PARTY_NOTICES.txt
+THIRD_PARTY_NOTICES_FULL.txt
 
 ################################################################################
-# Local History
+# MANTENER SOLO ESTOS ARCHIVOS (GitHub Pages)
 ################################################################################
-.localhistory/
 
-################################################################################
-# OptiScaler Manager Specific
-################################################################################
-# Crash logs (solo local, no subir)
-CrashLogs/
-
-# Downloaded mods cache (solo local)
-Mods/
-
-# User settings (solo local)
-Settings/
-
-################################################################################
-# KEEP THESE (Whitelist)
-################################################################################
-# Documentation
+# Documentación
 !README.md
 !LICENSE
-!CONTRIBUTING.md
-!CODE_OF_CONDUCT.md
-!*.md
+!_config.yml
 
-# Essential assets
-!Assets/**/*.png
-!Assets/**/*.jpg
-!Assets/**/*.ico
+# GitHub Actions para Pages
+!.github/
+!.github/workflows/
+!.github/workflows/pages.yml
 
-# Screenshots
-!Screenshots/*.png
-
-# GitHub Pages
+# Carpeta de documentación completa
+!docs/
 !docs/**/*
 
-# Useful scripts
-!*.ps1
+# Script de actualización de Pages
+!Update-GitHubPages.ps1
