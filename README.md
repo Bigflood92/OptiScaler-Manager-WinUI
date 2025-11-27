@@ -80,14 +80,14 @@ OptiScaler Manager is built with:
 
 ```
 OptiScaler Manager
-??? OptiScaler.Core          # Business logic layer
-?   ??? Services             # Core services (scanning, installation)
-?   ??? Models               # Data models
-?   ??? Contracts            # Service interfaces
-??? OptiScaler.UI            # Presentation layer
-    ??? Views                # XAML pages
-    ??? ViewModels           # View logic
-    ??? Converters           # Data binding converters
+|-- OptiScaler.Core          # Business logic layer
+|   |-- Services             # Core services (scanning, installation)
+|   |-- Models               # Data models
+|   |-- Contracts            # Service interfaces
+|-- OptiScaler.UI            # Presentation layer
+    |-- Views                # XAML pages
+    |-- ViewModels           # View logic
+    |-- Converters           # Data binding converters
 ```
 
 See [Architecture Documentation](docs/ARCHITECTURE.md) for details.
