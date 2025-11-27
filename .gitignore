@@ -1,89 +1,255 @@
-# .gitignore for PUBLIC repository (GitHub Pages only)
-# Este archivo debe excluir TODO el código del proyecto WinUI
+# .gitignore for OptiScaler Manager - PRIVATE Repository
 
 ################################################################################
-# EXCLUIR TODO EL CÓDIGO DEL PROYECTO
+# Visual Studio / IDEs
 ################################################################################
-
-# Proyectos .NET
-OptiScaler.UI/
-OptiScaler.Core/
-*.csproj
-*.sln
-global.json
-
-# Código fuente
-*.cs
-*.xaml
-*.xaml.cs
-
-# Scripts de desarrollo (mantener solo los de documentación)
-*.ps1
-!Update-GitHubPages.ps1
-
-# Archivos de configuración del proyecto
-Directory.Build.props
-Directory.Packages.props
-nuget.config
-
-# Archivos de construcción y binarios
-bin/
-obj/
 .vs/
 .vscode/
+.idea/
 *.user
 *.suo
+*.userosscache
+*.sln.docstates
+*.rsuser
+*.userprefs
 
-# Documentos internos del proyecto
-CHANGELOG.md
-EPIC_SESSION_FINAL_SUMMARY.md
-FINAL_SESSION_SUMMARY.md
-MSIX_PACKAGING_GUIDE.md
-PARTNER_CENTER_UPDATED_GUIDE.md
-PARTNER_CENTER_CHECKLIST.md
-PHASE_PLAN_UPDATED.md
-STORE_DESCRIPTION.md
-STORE_SUBMISSION_CHECKLIST.md
-STORE_SUBMISSION_GUIDE.md
-UpgradeLog.htm
-TestGitHub.cs
+################################################################################
+# Build Outputs
+################################################################################
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
 
-# Certificados y archivos sensibles
+################################################################################
+# .NET / NuGet
+################################################################################
+project.lock.json
+project.fragment.lock.json
+artifacts/
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+*.nuget.props
+*.nuget.targets
+
+################################################################################
+# MSIX / Windows Store Packages
+################################################################################
+AppPackages/
+BundleArtifacts/
+Package.StoreAssociation.xml
+_pkginfo.txt
+*.appx
+*.appxbundle
+*.appxupload
+*.msix
+*.msixbundle
+*.msixupload
+
+################################################################################
+# CRITICAL - SENSITIVE FILES (NEVER COMMIT TO GITHUB)
+################################################################################
+# Certificates - NUNCA subir certificados privados
 *.pfx
 *.p12
+*.key
+*.cer
+*.crt
+
+# Secrets - NUNCA subir API keys o secrets
 secrets.json
+appsettings.Development.json
+.env
+.env.local
+*.secret
 
-# Paquetes y outputs
-*.msix
-*.appx
-AppPackages/
+# Personal settings
+launchSettings.json
+
+################################################################################
+# Compiled Files
+################################################################################
+*_i.c
+*_p.c
+*_h.h
+*.ilk
+*.meta
+*.obj
+*.iobj
+*.pch
+*.pdb
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*_wpftmp.csproj
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
+################################################################################
+# Cache Files
+################################################################################
+*.[Cc]ache
+!?*.[Cc]ache/
+*.DotSettings.user
+
+################################################################################
+# Windows / macOS
+################################################################################
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+._*
+
+################################################################################
+# Backup Files
+################################################################################
+*.backup
+*.bak
+*~
+*.old
+*.orig
+
+################################################################################
+# Scripts Locales (No necesarios en GitHub)
+################################################################################
+# Scripts de prueba y desarrollo local
+Test*.ps1
+Screenshot-Helper.ps1
+Install-Package.ps1
+Install-Simple.ps1
+Create-MSIXPackage.ps1
+Sign-MSIXPackage.ps1
+Cleanup-PublicRepo.ps1
+
+################################################################################
+# Archivos Temporales del Proyecto
+################################################################################
+# Documentos de sesiones de desarrollo
+EPIC_SESSION_FINAL_SUMMARY.md
+FINAL_SESSION_SUMMARY.md
+UpgradeLog.htm
+
+# Carpetas de backup/pruebas
+Backup/
+OptiScaler.UI.backup/
+TestWinUI3/
+antiguo proyecto/
+**/Assets/Backup_*/
+Logos/
+temp/
+cache/
+Config/
+
+# Package build outputs locales
 PackageOutput/
+PackageFiles/
 
-# Assets del proyecto (no necesarios en docs)
-Assets/
-Screenshots/
-
-# Archivos de terceros
-THIRD_PARTY_NOTICES.txt
-THIRD_PARTY_NOTICES_FULL.txt
+# Archivos temporales de Git
+.gitignore.backup
+.gitignore.public
 
 ################################################################################
-# MANTENER SOLO ESTOS ARCHIVOS (GitHub Pages)
+# Test Files
 ################################################################################
+TestGitHub.cs
 
-# Documentación
+################################################################################
+# Fody
+################################################################################
+FodyWeavers.xsd
+
+################################################################################
+# Local History
+################################################################################
+.localhistory/
+
+################################################################################
+# OptiScaler Manager Specific
+################################################################################
+# Crash logs (solo local, no subir)
+CrashLogs/
+
+# Downloaded mods cache (solo local)
+Mods/
+
+# User settings (solo local)
+Settings/
+
+################################################################################
+# GitHub Pages (se mantiene en repositorio público)
+################################################################################
+_config.yml
+.github/workflows/pages.yml
+Update-GitHubPages.ps1
+
+################################################################################
+# Documentación que solo va al repositorio público
+################################################################################
+docs/.nojekyll
+docs/index.html
+docs/index.md
+
+################################################################################
+# KEEP THESE (Whitelist - Archivos importantes del proyecto)
+################################################################################
+# Documentación esencial
 !README.md
 !LICENSE
-!_config.yml
+!CONTRIBUTING.md
+!CODE_OF_CONDUCT.md
+!CHANGELOG.md
 
-# GitHub Actions para Pages
-!.github/
-!.github/workflows/
-!.github/workflows/pages.yml
+# Documentación técnica
+!docs/ARCHITECTURE.md
+!docs/USAGE_EXAMPLES.md
+!docs/MSIX_SETUP.md
+!docs/STORE_PUBLISHING.md
+!docs/PrivacyPolicy.html
+!docs/EULA.html
+!docs/README.md
 
-# Carpeta de documentación completa
-!docs/
-!docs/**/*
+# Guías de desarrollo y publicación
+!MSIX_PACKAGING_GUIDE.md
+!PARTNER_CENTER_UPDATED_GUIDE.md
+!PARTNER_CENTER_CHECKLIST.md
+!PHASE_PLAN_UPDATED.md
+!STORE_DESCRIPTION.md
+!STORE_SUBMISSION_CHECKLIST.md
+!STORE_SUBMISSION_GUIDE.md
 
-# Script de actualización de Pages
-!Update-GitHubPages.ps1
+# Archivos legales
+!THIRD_PARTY_NOTICES.txt
+!THIRD_PARTY_NOTICES_FULL.txt
+!docs/ADDITIONAL_LICENSE_INFO.md
+!CERTIFICATE_OPTIONS_GUIDE.md
+
+# Assets esenciales (no backups)
+!Assets/**/*.png
+!Assets/**/*.jpg
+!Assets/**/*.ico
+!Screenshots/*.png
