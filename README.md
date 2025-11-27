@@ -8,13 +8,13 @@
 
 ---
 
-## ?? Documentation Site
+## Documentation Site
 
-**?? Visit our documentation:** [https://bigflood92.github.io/OptiScaler-Manager-WinUI/](https://bigflood92.github.io/OptiScaler-Manager-WinUI/)
+**Visit our documentation:** [https://bigflood92.github.io/OptiScaler-Manager-WinUI/](https://bigflood92.github.io/OptiScaler-Manager-WinUI/)
 
 ---
 
-## ?? About This Repository
+## About This Repository
 
 This is the **public documentation repository** for OptiScaler Manager. The source code is maintained in a private repository.
 
@@ -28,22 +28,22 @@ This is the **public documentation repository** for OptiScaler Manager. The sour
 
 ---
 
-## ? What is OptiScaler Manager?
+## What is OptiScaler Manager?
 
 OptiScaler Manager is a Windows application that simplifies the installation and configuration of advanced upscaling mods for PC games:
 
 ### Key Features
 
-- ?? **Multi-Platform Detection** - Automatically finds games from Steam, Epic, Xbox, GOG, EA, Ubisoft
-- ?? **Upscaling Technologies** - DLSS, FSR 2.2/3.1, XeSS support
-- ? **Frame Generation** - Enable DLSS 3 and FSR 3 frame generation
-- ?? **Easy Configuration** - Quick presets and advanced settings
-- ?? **Modern UI** - Xbox-style interface with gamepad support
-- ?? **Privacy Focused** - No telemetry, all data stays local
+- **Multi-Platform Detection** - Automatically finds games from Steam, Epic, Xbox, GOG, EA, Ubisoft
+- **Upscaling Technologies** - DLSS, FSR 2.2/3.1, XeSS support
+- **Frame Generation** - Enable DLSS 3 and FSR 3 frame generation
+- **Easy Configuration** - Quick presets and advanced settings
+- **Modern UI** - Xbox-style interface with gamepad support
+- **Privacy Focused** - No telemetry, all data stays local
 
 ---
 
-## ?? Quick Start
+## Quick Start
 
 ### Installation
 
@@ -59,15 +59,15 @@ OptiScaler Manager is a Windows application that simplifies the installation and
 
 ### Basic Usage
 
-1. **Scan Games** ? Detect installed games automatically
-2. **Select Game** ? Choose from your library
-3. **Install Mod** ? One-click installation
-4. **Configure** ? Adjust upscaler and quality preset
-5. **Play** ? Launch game with enhanced performance
+1. **Scan Games** - Detect installed games automatically
+2. **Select Game** - Choose from your library
+3. **Install Mod** - One-click installation
+4. **Configure** - Adjust upscaler and quality preset
+5. **Play** - Launch game with enhanced performance
 
 ---
 
-## ??? Architecture
+## Architecture
 
 OptiScaler Manager is built with:
 
@@ -94,7 +94,7 @@ See [Architecture Documentation](docs/ARCHITECTURE.md) for details.
 
 ---
 
-## ?? System Requirements
+## System Requirements
 
 ### Minimum
 - **OS:** Windows 10 version 1809 (build 17763) or later
@@ -109,21 +109,21 @@ See [Architecture Documentation](docs/ARCHITECTURE.md) for details.
 
 ---
 
-## ?? Privacy & Security
+## Privacy & Security
 
 OptiScaler Manager is designed with privacy in mind:
 
-- ? **No Data Collection** - Zero telemetry or analytics
-- ? **No User Accounts** - Use completely offline
-- ? **Local Storage Only** - Settings stay on your device
-- ? **No Tracking** - No cookies, no third-party services
-- ? **Open Configuration** - Human-readable INI files
+- **No Data Collection** - Zero telemetry or analytics
+- **No User Accounts** - Use completely offline
+- **Local Storage Only** - Settings stay on your device
+- **No Tracking** - No cookies, no third-party services
+- **Open Configuration** - Human-readable INI files
 
 Read our full [Privacy Policy](https://bigflood92.github.io/OptiScaler-Manager-WinUI/PrivacyPolicy.html).
 
 ---
 
-## ?? Contributing
+## Contributing
 
 We welcome contributions! If you'd like to contribute:
 
@@ -135,7 +135,7 @@ For code contributions, please contact the maintainer for access to the private 
 
 ---
 
-## ?? License
+## License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
@@ -151,7 +151,7 @@ See [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt) for complete attribution.
 
 ---
 
-## ?? Credits
+## Credits
 
 - **OptiScaler Framework** - [cdozdil](https://github.com/cdozdil/OptiScaler)
 - **Microsoft** - For .NET and WinUI 3
@@ -161,37 +161,37 @@ Platform logos are trademarks of their respective owners.
 
 ---
 
-## ?? Support
+## Support
 
-- ?? **Bug Reports:** [GitHub Issues](https://github.com/Bigflood92/OptiScaler-Manager-WinUI/issues)
-- ?? **Discussions:** [GitHub Discussions](https://github.com/Bigflood92/OptiScaler-Manager-WinUI/discussions)
-- ?? **Contact:** Open an issue for general inquiries
+- **Bug Reports:** [GitHub Issues](https://github.com/Bigflood92/OptiScaler-Manager-WinUI/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/Bigflood92/OptiScaler-Manager-WinUI/discussions)
+- **Contact:** Open an issue for general inquiries
 
 ---
 
-## ??? Roadmap
+## Roadmap
 
 ### Current Version: v0.1.0 (Beta)
-- ? Multi-platform game detection
-- ? OptiScaler mod installation
-- ? Configuration presets
-- ? Xbox-style UI
+- Multi-platform game detection
+- OptiScaler mod installation
+- Configuration presets
+- Xbox-style UI
 
 ### Planned Features
-- ?? **Automatic Updates** - Keep mods up to date
-- ?? **Xbox Game Bar Widget** - Quick access overlay
-- ?? **Benchmark Tools** - Before/after performance comparison
-- ?? **Cloud Sync** - Sync settings across devices (optional)
+- **Automatic Updates** - Keep mods up to date
+- **Xbox Game Bar Widget** - Quick access overlay
+- **Benchmark Tools** - Before/after performance comparison
+- **Cloud Sync** - Sync settings across devices (optional)
 
 ---
 
-## ? Star This Repo
+## Star This Repo
 
 If you find OptiScaler Manager useful, please consider giving it a star! It helps others discover the project.
 
 ---
 
-**Made with ?? for the PC gaming community**
+**Made with care for the PC gaming community**
 
 **Developer:** Bigflood92  
 **Version:** 0.1.0 (Development)  
